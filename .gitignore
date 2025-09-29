@@ -1,4 +1,6 @@
 .hs_err_pid*.log
+# Ignorar archivos de configuración sensibles
+backend/src/main/resources/application.properties
 
 
 .hs_err_pid23192.log
