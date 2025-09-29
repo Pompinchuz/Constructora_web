@@ -1,0 +1,31 @@
+
+<form [formGroup]="clienteForm" (ngSubmit)="onSubmit()">
+
+    <input type="text" formControlName="nombre" placeholder="Nombre" />
+    <div *ngIf="clienteForm.get('nombre')?.invalid && clienteForm.get('nombre')?.touched">
+      Nombre es requerido
+    </div>
+  
+    <input type="text" formControlName="documento" placeholder="Documento" />
+    <div *ngIf="clienteForm.get('documento')?.invalid && clienteForm.get('documento')?.touched">
+      Documento es requerido
+    </div>
+  
+    <input type="text" formControlName="direccion" placeholder="Dirección" />
+    <div *ngIf="clienteForm.get('direccion')?.invalid && clienteForm.get('direccion')?.touched">
+      Dirección es requerida
+    </div>
+  
+    <input type="text" formControlName="telefono" placeholder="Teléfono" />
+    <div *ngIf="clienteForm.get('telefono')?.invalid && clienteForm.get('telefono')?.touched">
+      Teléfono es requerido
+    </div>
+  
+    <input type="email" formControlName="email" placeholder="Email" />
+    <div *ngIf="clienteForm.get('email')?.invalid && clienteForm.get('email')?.touched">
+      Email válido es requerido
+    </div>
+  
+    <button type="submit" [disabled]="clienteForm.invalid">Registrar Cliente</button>
+  </form>
+  
