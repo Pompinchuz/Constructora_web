@@ -1,0 +1,85 @@
+Informe de Implementación y Cambios - Autenticación JWT en Proyecto Constructora
+
+Resumen:
+Se implementó un sistema de autenticación basado en JSON Web Tokens (JWT) para el backend en Spring Boot y el frontend en Angular, con control de acceso basado en roles (ADMIN). Se realizaron pruebas funcionales para validar login, logout, protección de endpoints y control de UI según roles.
+
+Cambios realizados:
+
+1. Backend (Spring Boot):
+
+- pom.xml:
+  - Se agregaron las dependencias necesarias para Spring Security y JWT (jjwt-api, jjwt-impl, jjwt-jackson).
+  
+- JwtUtil.java (nuevo archivo):
+  - Clase utilitaria para generar, validar e invalidar tokens JWT.
+  - Incluye métodos para extraer roles y usuario del token.
+  - Implementa blacklist para invalidar tokens en logout.
+  - Registra en consola creación e invalidación de tokens.
+
+- AuthController.java (nuevo archivo):
+  - Endpoint /auth/login que recibe credenciales (hardcoded admin/password).
+  - Devuelve token JWT con rol ADMIN si credenciales válidas.
+  - Endpoint /auth/logout que invalida el token actual.
+
+- SecurityConfig.java (nuevo archivo):
+  - Configura Spring Security para usar JWT.
+  - Define filtro JwtAuthenticationFilter para validar tokens en cada request.
+  - Permite acceso libre a /auth/** y protege otros endpoints.
+  - Habilita seguridad basada en roles con @EnableMethodSecurity.
+
+- JwtAuthenticationFilter.java (nuevo archivo):
+  - Filtro que extrae token JWT de headers Authorization.
+  - Valida token y establece contexto de seguridad con roles.
+
+- ClienteController.java:
+  - Se agregó anotación @PreAuthorize("hasRole('ADMIN')") para proteger creación de clientes.
+
+- application.properties:
+  - Configuración de conexión a base de datos MySQL.
+
+2. Frontend (Angular):
+
+- auth.service.ts:
+  - Servicio para login, logout, almacenamiento seguro de JWT en localStorage.
+  - Obtiene rol del usuario decodificando el token.
+  - Maneja observables para estado de login.
+
+- login.component.ts, login.component.html, login.component.css:
+  - Componente para formulario de login con validación y manejo de errores.
+
+- app.component.ts, app.component.html:
+  - Controla estado global de login y rol.
+  - Muestra/oculta elementos UI según rol.
+  - Implementa logout.
+
+- cliente-form.component.ts, cliente-form.component.html:
+  - Formulario para crear clientes.
+  - Visible solo para usuarios con rol ADMIN.
+
+- app.routes.ts:
+  - Rutas configuradas para login y página principal.
+
+- app.config.ts:
+  - Importación de módulos necesarios (FormsModule, HttpClientModule, etc).
+
+Pruebas realizadas:
+
+- Backend:
+  - Login con credenciales válidas devuelve token JWT.
+  - Creación de cliente protegida con token y rol ADMIN.
+  - Logout invalida token y bloquea acceso posterior.
+  
+- Frontend:
+  - Login almacena token en localStorage.
+  - UI muestra/oculta formularios según rol.
+  - Logout limpia token y redirige a login.
+  - Manejo seguro de localStorage para evitar errores en entornos sin acceso.
+
+Pendientes / Recomendaciones:
+
+- Realizar pruebas exhaustivas de UI navegando todas las páginas y validando comportamiento.
+- Manejar expiración de tokens y refresco si se desea.
+- Mejorar manejo de usuarios y roles en backend (actualmente hardcoded).
+- Añadir validaciones y manejo de errores más robusto en frontend.
+
+Este informe resume todos los cambios y pruebas realizados para implementar autenticación JWT con roles en el proyecto Constructora. Si deseas, puedo ayudarte a preparar el commit con estos cambios o continuar con mejoras adicionales.

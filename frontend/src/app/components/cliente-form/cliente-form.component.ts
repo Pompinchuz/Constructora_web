@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ClienteService } from '../../services/cliente.service';
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -9,11 +10,12 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule]
 })
-export class ClienteFormComponent {
+export class ClienteFormComponent implements OnInit {
 
   clienteForm: FormGroup;
+  userRole: string | null = null;
 
-  constructor(private fb: FormBuilder, private clienteService: ClienteService) {
+  constructor(private fb: FormBuilder, private clienteService: ClienteService, private authService: AuthService) {
     // Aquí inicializas el formulario usando el FormBuilder INICIALIZADO
     this.clienteForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -22,6 +24,10 @@ export class ClienteFormComponent {
       telefono: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]]
     });
+  }
+
+  ngOnInit(): void {
+    this.userRole = this.authService.getUserRole();
   }
 
   onSubmit() {

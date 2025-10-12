@@ -3,6 +3,7 @@ package com.constructora.backend.controller;
 import com.constructora.backend.model.Cliente;
 import com.constructora.backend.repository.ClienteRepository;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:4200") // Permite conexión con Angular
@@ -17,6 +18,7 @@ public class ClienteController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public Cliente crearCliente(@RequestBody Cliente cliente) {
         return clienteRepository.save(cliente);
     }

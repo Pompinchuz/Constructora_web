@@ -1,2 +1,12 @@
 
-<router-outlet />
+<div *ngIf="!isLoggedIn">
+  <p>No has iniciado sesión. <a routerLink="/login">Ir al login</a></p>
+</div>
+<div *ngIf="isLoggedIn">
+  <header>
+    <h1>Constructora App</h1>
+    <p>Rol: {{ userRole }}</p>
+    <button (click)="logout()">Cerrar Sesión</button>
+  </header>
+  <router-outlet />
+</div>
