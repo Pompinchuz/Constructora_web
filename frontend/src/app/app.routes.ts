@@ -1,7 +1,9 @@
-// app.routes.ts
 import { Routes } from '@angular/router';
-import { ClienteFormComponent } from './components/cliente-form/cliente-form.component';
+import { HomeComponent } from './components/home/home.component';
+import { LoginComponent } from './components/login/login.component';
 
 export const routes: Routes = [
-  { path: '', component: ClienteFormComponent },
+  { path: '', component: HomeComponent },
+  { path: 'login', component: LoginComponent },
+  
 ];

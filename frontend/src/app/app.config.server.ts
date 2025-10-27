@@ -1,14 +1,15 @@
-import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes'; // o ./app.routes.server si lo usas
 import { provideServerRendering } from '@angular/platform-server';
-import { provideServerRouting } from '@angular/ssr';
-import { appConfig } from './app.config';
-import { serverRoutes } from './app.routes.server';
+import { provideHttpClient } from '@angular/common/http';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
-const serverConfig: ApplicationConfig = {
+export const appConfig: ApplicationConfig = {
   providers: [
-    provideServerRendering(),
-    provideServerRouting(serverRoutes)
+    provideServerRendering(),   // 👈 imprescindible para SSR
+    provideRouter(routes),
+    provideHttpClient(),
+    provideNoopAnimations()     // 👈 evita animaciones en render del servidor
   ]
 };
-
-export const config = mergeApplicationConfig(appConfig, serverConfig);

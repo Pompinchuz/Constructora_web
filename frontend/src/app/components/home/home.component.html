@@ -1,0 +1,150 @@
+<mat-toolbar color="primary" class="app-toolbar">
+    <div class="toolbar-inner">
+      <div class="brand">
+        <img src="https://raw.githubusercontent.com/Pompinchuz/bunker_hr/refs/heads/main/celulares/Logo_em.png" alt="AG CONFERR" />
+        <span>AG CONFERR </span>
+      </div>
+  
+      <nav class="nav-links">
+        <a mat-button routerLink="/sobre-nosotros">Sobre nosotros</a>
+        <a mat-button routerLink="/proyectos">Proyectos</a>
+        <a mat-button routerLink="/servicios">Servicios</a>
+        
+        <a mat-stroked-button color="accent" routerLink="/contacto">Contáctanos</a>
+        <a mat-flat-button color="accent" routerLink="/login">Iniciar sesión o registrarse</a>
+      </nav>
+  
+      <button class="menu-btn" mat-icon-button aria-label="menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+  </mat-toolbar>
+  
+
+  <section class="hero" [@fadeIn]>
+    <div class="hero-overlay"></div>
+  
+    <div class="hero-content">
+      <h1>
+        <span class="line-1">AG CONFERR</span>
+        <span class="line-2">SS.GG</span>
+        <span class="line-3">Constructora</span>
+      </h1>
+  
+      <p class="hero-text">
+        Soluciones integrales en construcción, remodelación y servicios generales.
+        Transformamos ideas en proyectos sólidos, seguros y de calidad.
+      </p>
+  
+      <div class="hero-cta">
+        <a mat-flat-button color="accent" routerLink="/proyectos">Ver proyectos</a>
+        <a mat-stroked-button color="accent" routerLink="/servicios">Nuestros servicios</a>
+      </div>
+    </div>
+  
+    <!-- Tarjetas de valor a la derecha -->
+    <div class="hero-features" [@staggerList]>
+      <mat-card class="feat" *ngFor="let f of features" [@fadeUp]>
+        <mat-icon class="feat-icon">{{ f.icon }}</mat-icon>
+        <div class="feat-body">
+          <h3>{{ f.title }}</h3>
+          <p>{{ f.desc }}</p>
+        </div>
+      </mat-card>
+    </div>
+  </section>
+  
+  <!-- SERVICIOS -->
+  <section class="services section" id="servicios">
+    <div class="section-head">
+      <h2>Servicios</h2>
+      <mat-divider></mat-divider>
+    </div>
+  
+    <div class="services-grid">
+      <mat-card class="service-card" *ngFor="let s of services" [@fadeUp]>
+        <!-- Usamos la URL pública de la imagen -->
+        <img mat-card-image [src]="s.image" alt="{{ s.title }}" class="service-image" />
+        
+        <!-- Si prefieres mantener los iconos y la imagen al mismo tiempo -->
+        <mat-icon class="service-icon">{{ s.icon }}</mat-icon>
+        <h3>{{ s.title }}</h3>
+        <p>{{ s.desc }}</p>
+        <div class="card-actions">
+          <button mat-button color="primary">Saber más</button>
+        </div>
+      </mat-card>
+    </div>
+  </section>
+  
+ <!-- CONTACTO -->
+<section class="contact section" id="contacto">
+    <div class="section-head">
+      <h2>Conversemos</h2>
+      <mat-divider></mat-divider>
+    </div>
+  
+    <div class="contact-grid">
+      <form class="contact-form" [@fadeIn] autocomplete="off" novalidate>
+        <mat-form-field appearance="outline" floatLabel="always">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" placeholder="tu@correo.com" />
+          <mat-icon matSuffix>mail</mat-icon>
+        </mat-form-field>
+  
+        <mat-form-field appearance="outline" floatLabel="always">
+          <mat-label>Mensaje</mat-label>
+          <textarea matInput rows="7" placeholder="Cuéntanos tu proyecto"></textarea>
+          <mat-icon matSuffix>chat</mat-icon>
+        </mat-form-field>
+  
+        <!-- Botón para cargar el archivo -->
+        <button mat-flat-button color="accent" (click)="fileInput.click()">Adjuntar archivo</button>
+        
+        <!-- Campo oculto de archivo -->
+        <input #fileInput type="file" accept="image/*, .pdf, .docx" style="display: none;" />
+  
+        <button mat-flat-button color="accent" class="w-full">Contáctanos</button>
+      </form>
+  
+      <div class="contact-info" [@fadeUp]>
+        <div class="info-row">
+          <mat-icon>call</mat-icon>
+          <div>
+            <strong>Teléfono</strong>
+            <div class="muted">900579167</div>
+          </div>
+        </div>
+  
+        <div class="info-row">
+          <mat-icon>place</mat-icon>
+          <div>
+            <strong>Dirección</strong>
+            <div class="muted">Modelo N° 400</div>
+          </div>
+        </div>
+  
+        <div class="info-row">
+          <mat-icon>photo_camera</mat-icon>
+          <div>
+            <strong>Instagram</strong>
+            <div class="muted">&#64;AGCONFERR_SS.GG</div>
+          </div>
+        </div>
+  
+        <div class="info-row">
+          <mat-icon>smartphone</mat-icon>
+          <div>
+            <strong>TikTok</strong>
+            <div class="muted">&#64;AG_CONFERR_SS.GG</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  
+  <footer class="footer">
+    <div>© {{ year }} AG CONFERR SS.GG. Todos los derechos reservados.</div>
+  </footer>
+  
