@@ -11,6 +11,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 })
 export class LoginComponent {
   loginForm: FormGroup;
+  router: any;
 
   constructor(private fb: FormBuilder) {
     this.loginForm = this.fb.group({
@@ -21,9 +22,14 @@ export class LoginComponent {
 
   onSubmit(): void {
     if (this.loginForm.valid) {
-      const formData = this.loginForm.value;
-      console.log('Datos del login:', formData);
-      // Aquí iría tu llamada al backend para autenticar
+      const { correo, contrasena } = this.loginForm.value;
+
+      // Aquí podrías llamar a tu servicio de autenticación
+      console.log('Correo:', correo);
+      console.log('Contraseña:', contrasena);
+
+      // Si el login es exitoso:
+      this.router.navigate(['/']); // 👉 redirige a la página principal
     }
   }
 }

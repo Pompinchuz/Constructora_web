@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# Ignorar archivos sensibles
+backend/src/main/resources/*.properties
+*.env
