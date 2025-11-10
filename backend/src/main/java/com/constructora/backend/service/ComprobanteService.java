@@ -1,4 +1,4 @@
-package com.constructora.backend.service;
+/* package com.constructora.backend.service;
 
 import com.constructora.backend.controller.dto.comprobante.ComprobanteResponseDTO;
 import com.constructora.backend.controller.dto.comprobante.SubirComprobanteDTO;
@@ -78,4 +78,4 @@ public class ComprobanteService {
                 .fechaVerificacion(comprobante.getFechaVerificacion())
                 .build();
     }
-}
+} */

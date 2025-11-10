@@ -1,4 +1,4 @@
-package com.constructora.backend.service;
+/* package com.constructora.backend.service;
 
 import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -155,3 +155,4 @@ public class AuthService {
     
     // Métodos de mapeo...
 }
+ */

@@ -1,4 +1,4 @@
-package com.constructora.backend.service;
+/* package com.constructora.backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -119,4 +119,4 @@ public class SolicitudProformaService {
                 .clienteNombre(solicitud.getCliente().getNombreCompleto())
                 .build();
     }
-}
+} */
