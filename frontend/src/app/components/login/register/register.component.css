@@ -1,0 +1,90 @@
+:root {
+    --primary-700: #6177cf;
+    --primary-900: #4e63b8;
+    --accent-500: #e85e6c;
+    --bg: #f4f7fb;
+    --ink: #1c2234;
+    --muted: #6b7280;
+  }
+  
+  body {
+    background-color: var(--bg);
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--ink);
+  }
+  
+  .login-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  form h2 {
+    margin-bottom: 1.5rem;
+    color: var(--primary-900);
+  }
+  
+  label {
+    display: block;
+    margin: 1rem 0 0.5rem;
+    font-weight: 500;
+  }
+  
+  input[type='text'],
+  input[type='email'],
+  input[type='password'] {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #000;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  
+  input:focus {
+    border-color: var(--primary-700);
+    outline: none;
+  }
+  
+  button {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1.5rem;
+    background-color: var(--primary-700);
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  button:hover:not(:disabled) {
+    background-color: var(--primary-900);
+  }
+  
+  .tipo-cliente {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .tipo-cliente label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  
+  .tipo-cliente input {
+    margin-right: 0.5rem;
+  }
+  

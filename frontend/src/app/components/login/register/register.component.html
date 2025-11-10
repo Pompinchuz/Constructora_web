@@ -1,0 +1,50 @@
+<div class="login-container">
+    <form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+      <h2>Registro de Cliente</h2>
+  
+      <label>Tipo de cliente:</label>
+      <div class="tipo-cliente">
+        <label>
+          <input type="radio" formControlName="tipoCliente" value="natural" /> Persona Natural
+        </label>
+        <label>
+          <input type="radio" formControlName="tipoCliente" value="juridica" /> Persona Jurídica
+        </label>
+      </div>
+  
+      <!-- Persona Natural -->
+      <div *ngIf="registroForm.get('tipoCliente')?.value === 'natural'">
+        <label for="nombres">Nombres</label>
+        <input id="nombres" type="text" formControlName="nombres" placeholder="Ingrese sus nombres" />
+  
+        <label for="apellidos">Apellidos</label>
+        <input id="apellidos" type="text" formControlName="apellidos" placeholder="Ingrese sus apellidos" />
+      </div>
+  
+      <!-- Persona Jurídica -->
+      <div *ngIf="registroForm.get('tipoCliente')?.value === 'juridica'">
+        <label for="razonSocial">Razón Social</label>
+        <input id="razonSocial" type="text" formControlName="razonSocial" placeholder="Ingrese la razón social" />
+      </div>
+  
+      <!-- Comunes -->
+      <label for="correoElectronico">Correo Electrónico</label>
+      <input
+        id="correoElectronico"
+        type="email"
+        formControlName="correoElectronico"
+        placeholder="correo@ejemplo.com"
+      />
+  
+      <label for="contrasena">Contraseña</label>
+      <input
+        id="contrasena"
+        type="password"
+        formControlName="contrasena"
+        placeholder="••••••••"
+      />
+  
+      <button type="submit" [disabled]="registroForm.invalid">Registrar</button>
+    </form>
+  </div>
+  

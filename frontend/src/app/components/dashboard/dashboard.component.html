@@ -1,0 +1,114 @@
+<div class="dashboard-container container py-4">
+    <h2 class="text-center mb-4 fw-bold title">
+      <i class="bi bi-speedometer2 me-2"></i>Panel de Solicitudes
+    </h2>
+  
+    <div class="row g-4">
+      <!-- ==== LISTA DE SOLICITUDES ==== -->
+      <div class="col-lg-4 col-md-5">
+        <div class="card shadow-sm border-0 request-card" *ngFor="let solicitud of solicitudes" (click)="seleccionarSolicitud(solicitud)">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h5 class="card-title mb-0 text-primary">{{ solicitud.nombre }}</h5>
+              <span class="badge bg-secondary">{{ solicitud.estado }}</span>
+            </div>
+            <p class="card-text small text-muted mb-1">
+              <i class="bi bi-calendar3"></i> {{ solicitud.fecha }}
+            </p>
+            <p class="text-muted small">
+              <i class="bi bi-envelope"></i> {{ solicitud.email }}
+            </p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- ==== DETALLE DE SOLICITUD ==== -->
+      <div class="col-lg-8 col-md-7">
+        <!-- Mensaje inicial -->
+        <div *ngIf="!selectedRequest" class="alert alert-info text-center shadow-sm py-4">
+          <i class="bi bi-info-circle-fill me-2"></i>
+          Selecciona una solicitud para ver el detalle y crear la proforma.
+        </div>
+  
+        <!-- Panel de detalle -->
+        <div *ngIf="selectedRequest" class="card border-0 shadow-sm p-4 animate__animated animate__fadeIn">
+          <h4 class="fw-bold mb-3 text-dark">
+            <i class="bi bi-person-circle me-2"></i>{{ selectedRequest.nombre }}
+          </h4>
+  
+          <div class="mb-3">
+            <p class="mb-1"><strong>Correo:</strong> {{ selectedRequest.email }}</p>
+            <p class="mb-1"><strong>Descripción:</strong> {{ selectedRequest.descripcion }}</p>
+          </div>
+  
+          <hr>
+  
+          <!-- FORMULARIO DE PARTIDAS -->
+          <h5 class="fw-bold mb-3 text-secondary">
+            <i class="bi bi-list-check me-2"></i>Partidas del presupuesto
+          </h5>
+  
+          <form [formGroup]="partidaForm" class="row g-3 align-items-end" (ngSubmit)="agregarPartida()">
+            <div class="col-md-5">
+              <label class="form-label fw-semibold">Descripción</label>
+              <input type="text" class="form-control" formControlName="descripcion" placeholder="Ej. Diseño">
+            </div>
+            <div class="col-md-2">
+              <label class="form-label fw-semibold">Cantidad</label>
+              <input type="number" class="form-control" formControlName="cantidad" min="1">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label fw-semibold">Precio (S/)</label>
+              <input type="number" class="form-control" formControlName="precio" min="0">
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-dark w-100">
+                <i class="bi bi-plus-circle"></i> Añadir
+              </button>
+            </div>
+          </form>
+  
+          <!-- TABLA DE PARTIDAS -->
+          <div class="table-responsive mt-4">
+            <table class="table table-hover align-middle">
+              <thead class="table-primary text-center">
+                <tr>
+                  <th>Descripción</th>
+                  <th>Cant.</th>
+                  <th>Precio</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let p of partidas">
+                  <td>{{ p.descripcion }}</td>
+                  <td>{{ p.cantidad }}</td>
+                  <td>S/ {{ p.precio }}</td>
+                  <td><strong>S/ {{ p.cantidad * p.precio }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+  
+          <!-- TOTAL GENERAL -->
+          <div class="text-end mt-3">
+            <h5 class="fw-bold text-primary">Total general: S/ {{ calcularTotal() }}</h5>
+          </div>
+  
+          <!-- BOTONES DE ACCIÓN -->
+          <div class="mt-4 d-flex flex-wrap justify-content-end gap-2">
+            <button class="btn btn-success">
+              <i class="bi bi-check2-circle"></i> Aprobar
+            </button>
+            <button class="btn btn-danger">
+              <i class="bi bi-x-circle"></i> Rechazar
+            </button>
+            <button class="btn btn-primary">
+              <i class="bi bi-send"></i> Enviar al Cliente
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
