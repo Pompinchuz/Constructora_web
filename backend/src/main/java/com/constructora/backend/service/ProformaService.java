@@ -1,4 +1,4 @@
-/* package com.constructora.backend.service;
+package com.constructora.backend.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.constructora.backend.controller.dto.CrearProformaDTO;
 import com.constructora.backend.controller.dto.GastoProformaDTO;
 import com.constructora.backend.controller.dto.GastoProformaResponseDTO;
+import com.constructora.backend.controller.dto.ProformaEstadisticasDTO;
 import com.constructora.backend.controller.dto.ProformaResponseDTO;
 import com.constructora.backend.entity.Administrador;
 import com.constructora.backend.entity.Proforma;
@@ -26,6 +27,8 @@ import com.constructora.backend.repository.AdministradorRepository;
 import com.constructora.backend.repository.GastoProformaRepository;
 import com.constructora.backend.repository.ProformaRepository;
 import com.constructora.backend.repository.SolicitudProformaRepository;
+
+import lombok.RequiredArgsConstructor;
 
 
 @Service
@@ -123,12 +126,85 @@ public class ProformaService {
         emailService.enviarProforma(proforma);
     }
     
-    @Transactional
+    @Transactional(readOnly = true)
+    public ProformaResponseDTO obtenerProformaPorId(Long id) {
+        Proforma proforma = proformaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Proforma no encontrada"));
+        return mapearAResponse(proforma);
+    }
+    
+    @Transactional(readOnly = true)
+    public ProformaResponseDTO obtenerProformaPorCodigo(String codigo) {
+        Proforma proforma = proformaRepository.findByCodigo(codigo)
+                .orElseThrow(() -> new NotFoundException("Proforma no encontrada"));
+        return mapearAResponse(proforma);
+    }
+    
+    @Transactional(readOnly = true)
     public List<ProformaResponseDTO> obtenerProformasPorCliente(Long clienteId) {
         return proformaRepository.findByClienteIdOrderByFechaCreacionDesc(clienteId)
                 .stream()
                 .map(this::mapearAResponse)
                 .collect(Collectors.toList());
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ProformaResponseDTO> obtenerTodasProformas(EstadoProforma estado) {
+        List<Proforma> proformas;
+        
+        if (estado != null) {
+            proformas = proformaRepository.findByEstadoOrderByFechaCreacionDesc(estado);
+        } else {
+            proformas = proformaRepository.findAll();
+        }
+        
+        return proformas.stream()
+                .map(this::mapearAResponse)
+                .collect(Collectors.toList());
+    }
+    
+    @Transactional
+    public ProformaResponseDTO actualizarEstado(Long id, EstadoProforma estado) {
+        Proforma proforma = proformaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Proforma no encontrada"));
+        
+        proforma.setEstado(estado);
+        proforma = proformaRepository.save(proforma);
+        
+        return mapearAResponse(proforma);
+    }
+    
+    @Transactional
+    public void eliminarProforma(Long id) {
+        Proforma proforma = proformaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Proforma no encontrada"));
+        
+        if (proforma.getFechaEnvio() != null) {
+            throw new BadRequestException("No se puede eliminar una proforma ya enviada");
+        }
+        
+        gastoRepository.deleteByProformaId(id);
+        proformaRepository.delete(proforma);
+    }
+    
+    @Transactional(readOnly = true)
+    public ProformaEstadisticasDTO obtenerEstadisticas() {
+        Long totalProformas = proformaRepository.count();
+        Long proformasEnviadas = proformaRepository.countByEstado(EstadoProforma.ENVIADA);
+        Long proformasPagadas = proformaRepository.countByEstado(EstadoProforma.PAGADA);
+        Long proformasRechazadas = proformaRepository.countByEstado(EstadoProforma.RECHAZADA);
+        
+        Double montoFacturado = proformaRepository.calcularTotalFacturado();
+        
+        return ProformaEstadisticasDTO.builder()
+                .totalProformas(totalProformas)
+                .proformasEnviadas(proformasEnviadas)
+                .proformasPagadas(proformasPagadas)
+                .proformasRechazadas(proformasRechazadas)
+                .montoTotal(BigDecimal.ZERO)
+                .montoFacturado(montoFacturado != null ? 
+                        BigDecimal.valueOf(montoFacturado) : BigDecimal.ZERO)
+                .build();
     }
     
     private String generarCodigoProforma() {
@@ -169,4 +245,4 @@ public class ProformaService {
                 .gastos(gastosDTO)
                 .build();
     }
-} */
+}

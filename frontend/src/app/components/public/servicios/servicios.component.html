@@ -1,1 +1,78 @@
-<p>servicios works!</p>
+<!-- ============================================ -->
+<!-- SERVICIOS.COMPONENT.HTML -->
+<!-- ============================================ -->
+
+<div class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Header de la sección -->
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          Nuestros Servicios
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Ofrecemos soluciones integrales para tu proyecto de construcción, desde la planificación hasta la entrega final
+        </p>
+      </div>
+  
+      <!-- Grid de servicios -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div 
+          *ngFor="let servicio of servicios"
+          class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 p-8">
+          
+          <!-- Icono -->
+          <div class="flex justify-center mb-6">
+            <div class="bg-blue-100 rounded-full p-4">
+              <svg class="h-12 w-12 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path 
+                  stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  [attr.d]="servicio.icono"/>
+              </svg>
+            </div>
+          </div>
+  
+          <!-- Título -->
+          <h3 class="text-2xl font-bold text-gray-900 mb-4 text-center">
+            {{ servicio.titulo }}
+          </h3>
+  
+          <!-- Descripción -->
+          <p class="text-gray-600 mb-6 text-center">
+            {{ servicio.descripcion }}
+          </p>
+  
+          <!-- Características -->
+          <ul class="space-y-2">
+            <li 
+              *ngFor="let caracteristica of servicio.caracteristicas"
+              class="flex items-start space-x-2">
+              <svg class="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+              </svg>
+              <span class="text-sm text-gray-700">{{ caracteristica }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+  
+      <!-- CTA -->
+      <div class="mt-16 text-center">
+        <div class="bg-white rounded-xl shadow-lg p-8 max-w-2xl mx-auto">
+          <h3 class="text-2xl font-bold text-gray-900 mb-4">
+            ¿Listo para comenzar tu proyecto?
+          </h3>
+          <p class="text-gray-600 mb-6">
+            Regístrate ahora y solicita tu proforma personalizada sin compromiso
+          </p>
+          <button 
+            (click)="solicitarProforma()"
+            class="px-8 py-4 bg-blue-600 text-white text-lg font-semibold rounded-lg hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 shadow-lg">
+            Solicitar Proforma Gratis
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>

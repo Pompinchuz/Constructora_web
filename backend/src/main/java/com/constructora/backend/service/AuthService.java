@@ -1,9 +1,12 @@
-/* package com.constructora.backend.service;
+package com.constructora.backend.service;
 
 import java.time.LocalDateTime;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.constructora.backend.controller.dto.ClientePersonaJuridicaResponseDTO;
+import com.constructora.backend.controller.dto.ClientePersonaNaturalResponseDTO;
 import com.constructora.backend.controller.dto.auth.LoginRequestDTO;
 import com.constructora.backend.controller.dto.auth.LoginResponseDTO;
 import com.constructora.backend.controller.dto.auth.RegistroPersonaJuridicaDTO;
@@ -153,6 +156,52 @@ public class AuthService {
         };
     }
     
-    // Métodos de mapeo...
+    // ============================================
+    // MÉTODOS DE VALIDACIÓN
+    // ============================================
+    
+    public boolean esCorreoDisponible(String correo) {
+        return !usuarioRepository.existsByCorreoElectronico(correo);
+    }
+    
+    public boolean esDniDisponible(String dni) {
+        return !clienteNaturalRepository.existsByDni(dni);
+    }
+    
+    public boolean esRucDisponible(String ruc) {
+        return !clienteJuridicoRepository.existsByRuc(ruc);
+    }
+    
+    // ============================================
+    // MÉTODOS DE MAPEO
+    // ============================================
+    
+    private ClientePersonaNaturalResponseDTO mapearClienteNaturalAResponse(ClientePersonaNatural cliente) {
+        ClientePersonaNaturalResponseDTO dto = new ClientePersonaNaturalResponseDTO();
+        dto.setId(cliente.getId());
+        dto.setCorreoElectronico(cliente.getUsuario().getCorreoElectronico());
+        dto.setTelefono(cliente.getTelefono());
+        dto.setDireccion(cliente.getDireccion());
+        dto.setFechaRegistro(cliente.getFechaRegistro());
+        dto.setActivo(cliente.getUsuario().getActivo());
+        dto.setNombres(cliente.getNombres());
+        dto.setApellidos(cliente.getApellidos());
+        dto.setDni(cliente.getDni());
+        dto.setFechaNacimiento(cliente.getFechaNacimiento());
+        return dto;
+    }
+    
+    private ClientePersonaJuridicaResponseDTO mapearClienteJuridicoAResponse(ClientePersonaJuridica cliente) {
+        ClientePersonaJuridicaResponseDTO dto = new ClientePersonaJuridicaResponseDTO();
+        dto.setId(cliente.getId());
+        dto.setCorreoElectronico(cliente.getUsuario().getCorreoElectronico());
+        dto.setTelefono(cliente.getTelefono());
+        dto.setDireccion(cliente.getDireccion());
+        dto.setFechaRegistro(cliente.getFechaRegistro());
+        dto.setActivo(cliente.getUsuario().getActivo());
+        dto.setRazonSocial(cliente.getRazonSocial());
+        dto.setRuc(cliente.getRuc());
+        dto.setRepresentanteLegal(cliente.getRepresentanteLegal());
+        return dto;
+    }
 }
- */

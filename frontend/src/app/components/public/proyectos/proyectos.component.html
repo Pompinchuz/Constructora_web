@@ -1,1 +1,140 @@
-<p>proyectos works!</p>
+<!-- ============================================ -->
+<!-- PROYECTOS.COMPONENT.HTML - Con Placeholders -->
+<!-- ============================================ -->
+
+<div class="proyectos-section">
+    <div class="container">
+      
+      <!-- Header de la sección -->
+      <div class="section-header">
+        <h2 class="section-title">Proyectos Exitosos</h2>
+        <p class="section-subtitle">
+          Conoce algunos de nuestros proyectos completados con éxito
+        </p>
+      </div>
+  
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-container">
+        <div class="spinner"></div>
+      </div>
+  
+      <!-- Sin proyectos - Mostrar placeholders de ejemplo -->
+      <div *ngIf="!loading && proyectos.length === 0" class="proyectos-grid">
+        
+        <!-- Proyecto Placeholder 1 -->
+        <div class="proyecto-card">
+          <div class="proyecto-image placeholder-image">
+            <div class="placeholder-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+            <div class="badge-completado">Completado</div>
+          </div>
+          <div class="proyecto-content">
+            <h3 class="proyecto-nombre">Edificio Residencial Los Pinos</h3>
+            <div class="proyecto-ubicacion">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>Chiclayo, Lambayeque</span>
+            </div>
+            <p class="proyecto-descripcion">
+              Construcción de edificio de 5 pisos con 20 departamentos modernos
+            </p>
+            <div class="proyecto-footer">
+              <span class="proyecto-fecha">Diciembre 2024</span>
+              <span class="proyecto-imagenes">15 fotos</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Proyecto Placeholder 2 -->
+        <div class="proyecto-card">
+          <div class="proyecto-image placeholder-image-2">
+            <div class="placeholder-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+              </svg>
+            </div>
+            <div class="badge-completado">Completado</div>
+          </div>
+          <div class="proyecto-content">
+            <h3 class="proyecto-nombre">Casa Campestre El Bosque</h3>
+            <div class="proyecto-ubicacion">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>Picsi, Lambayeque</span>
+            </div>
+            <p class="proyecto-descripcion">
+              Casa de campo de 250m² con acabados de lujo y áreas verdes
+            </p>
+            <div class="proyecto-footer">
+              <span class="proyecto-fecha">Octubre 2024</span>
+              <span class="proyecto-imagenes">12 fotos</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Proyecto Placeholder 3 -->
+        <div class="proyecto-card">
+          <div class="proyecto-image placeholder-image-3">
+            <div class="placeholder-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+            <div class="badge-completado">Completado</div>
+          </div>
+          <div class="proyecto-content">
+            <h3 class="proyecto-nombre">Local Comercial Plaza Norte</h3>
+            <div class="proyecto-ubicacion">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>Chiclayo, Lambayeque</span>
+            </div>
+            <p class="proyecto-descripcion">
+              Remodelación integral de local comercial de 180m²
+            </p>
+            <div class="proyecto-footer">
+              <span class="proyecto-fecha">Septiembre 2024</span>
+              <span class="proyecto-imagenes">8 fotos</span>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Grid de proyectos reales -->
+      <div *ngIf="!loading && proyectos.length > 0" class="proyectos-grid">
+        <div *ngFor="let proyecto of proyectos" class="proyecto-card">
+          <div class="proyecto-image" [style.background-image]="'url(' + proyecto.imagenPrincipal + ')'">
+            <div class="badge-completado">Completado</div>
+          </div>
+          <div class="proyecto-content">
+            <h3 class="proyecto-nombre">{{ proyecto.nombre }}</h3>
+            <div class="proyecto-ubicacion" *ngIf="proyecto.ubicacion">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>{{ proyecto.ubicacion }}</span>
+            </div>
+            <p class="proyecto-descripcion">
+              {{ proyecto.descripcion || 'Proyecto de construcción completado exitosamente' }}
+            </p>
+            <div class="proyecto-footer">
+              <span class="proyecto-fecha">{{ formatearFecha(proyecto.fechaFinalizacion) }}</span>
+              <span class="proyecto-imagenes" *ngIf="proyecto.imagenes && proyecto.imagenes.length > 0">
+                {{ proyecto.imagenes.length }} fotos
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

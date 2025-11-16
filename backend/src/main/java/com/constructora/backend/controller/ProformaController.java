@@ -1,0 +1,276 @@
+// ============================================
+// PROFORMA CONTROLLER
+// ============================================
+
+// ProformaController.java
+package com.constructora.backend.controller;
+
+import com.constructora.backend.controller.dto.ApiResponseDTO;
+import com.constructora.backend.controller.dto.CrearProformaDTO;
+import com.constructora.backend.controller.dto.ProformaEstadisticasDTO;
+import com.constructora.backend.controller.dto.ProformaResponseDTO;
+import com.constructora.backend.entity.enums.EstadoProforma;
+import com.constructora.backend.service.ProformaService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/proformas")
+@RequiredArgsConstructor
+@Slf4j
+@CrossOrigin(origins = "${cors.allowed-origins}")
+public class ProformaController {
+    
+    private final ProformaService proformaService;
+    
+    /**
+     * Crear nueva proforma (ADMIN)
+     * POST /api/proformas
+     */
+    @PostMapping
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> crearProforma(
+            @Valid @RequestBody CrearProformaDTO request,
+            Authentication authentication) {
+        
+        Long adminId = obtenerAdminId(authentication);
+        
+        log.info("Admin {} creando proforma para solicitud {}", adminId, request.getSolicitudId());
+        
+        ProformaResponseDTO response = proformaService.crearProforma(request, adminId);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            ApiResponseDTO.<ProformaResponseDTO>builder()
+                .success(true)
+                .message("Proforma creada exitosamente")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Enviar proforma por correo (ADMIN)
+     * POST /api/proformas/{id}/enviar
+     */
+    @PostMapping("/{id}/enviar")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<Void>> enviarProforma(@PathVariable Long id) {
+        
+        log.info("Enviando proforma ID: {}", id);
+        
+        proformaService.enviarProforma(id);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<Void>builder()
+                .success(true)
+                .message("Proforma enviada por correo exitosamente")
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Obtener proforma por ID
+     * GET /api/proformas/{id}
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> obtenerProformaPorId(
+            @PathVariable Long id) {
+        
+        log.info("Obteniendo proforma ID: {}", id);
+        
+        ProformaResponseDTO response = proformaService.obtenerProformaPorId(id);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<ProformaResponseDTO>builder()
+                .success(true)
+                .message("Proforma encontrada")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Obtener proforma por código
+     * GET /api/proformas/codigo/{codigo}
+     */
+    @GetMapping("/codigo/{codigo}")
+    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> obtenerProformaPorCodigo(
+            @PathVariable String codigo) {
+        
+        log.info("Obteniendo proforma con código: {}", codigo);
+        
+        ProformaResponseDTO response = proformaService.obtenerProformaPorCodigo(codigo);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<ProformaResponseDTO>builder()
+                .success(true)
+                .message("Proforma encontrada")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Obtener mis proformas (CLIENTE)
+     * GET /api/proformas/mis-proformas
+     */
+    @GetMapping("/mis-proformas")
+    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    public ResponseEntity<ApiResponseDTO<List<ProformaResponseDTO>>> obtenerMisProformas(
+            Authentication authentication) {
+        
+        Long clienteId = obtenerClienteId(authentication);
+        
+        log.info("Cliente {} obteniendo sus proformas", clienteId);
+        
+        List<ProformaResponseDTO> proformas = 
+            proformaService.obtenerProformasPorCliente(clienteId);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<List<ProformaResponseDTO>>builder()
+                .success(true)
+                .message("Proformas obtenidas")
+                .data(proformas)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Listar todas las proformas (ADMIN)
+     * GET /api/proformas/admin/todas
+     */
+    @GetMapping("/admin/todas")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<List<ProformaResponseDTO>>> listarTodasProformas(
+            @RequestParam(required = false) EstadoProforma estado) {
+        
+        log.info("Admin listando proformas con estado: {}", estado);
+        
+        List<ProformaResponseDTO> proformas = proformaService.obtenerTodasProformas(estado);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<List<ProformaResponseDTO>>builder()
+                .success(true)
+                .message("Proformas obtenidas")
+                .data(proformas)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Actualizar estado de proforma (ADMIN)
+     * PATCH /api/proformas/{id}/estado
+     */
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> actualizarEstado(
+            @PathVariable Long id,
+            @RequestParam EstadoProforma estado) {
+        
+        log.info("Actualizando estado de proforma {} a {}", id, estado);
+        
+        ProformaResponseDTO response = proformaService.actualizarEstado(id, estado);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<ProformaResponseDTO>builder()
+                .success(true)
+                .message("Estado actualizado")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Marcar proforma como vista (CLIENTE)
+     * POST /api/proformas/{id}/marcar-vista
+     */
+    @PostMapping("/{id}/marcar-vista")
+    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    public ResponseEntity<ApiResponseDTO<Void>> marcarComoVista(@PathVariable Long id) {
+        
+        log.info("Marcando proforma {} como vista", id);
+        
+        proformaService.actualizarEstado(id, EstadoProforma.VISTA);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<Void>builder()
+                .success(true)
+                .message("Proforma marcada como vista")
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Eliminar proforma (ADMIN - solo si no ha sido enviada)
+     * DELETE /api/proformas/{id}
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<Void>> eliminarProforma(@PathVariable Long id) {
+        
+        log.info("Eliminando proforma ID: {}", id);
+        
+        proformaService.eliminarProforma(id);
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<Void>builder()
+                .success(true)
+                .message("Proforma eliminada")
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    /**
+     * Obtener estadísticas de proformas (ADMIN)
+     * GET /api/proformas/admin/estadisticas
+     */
+    @GetMapping("/admin/estadisticas")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<ProformaEstadisticasDTO>> obtenerEstadisticas() {
+        
+        log.info("Obteniendo estadísticas de proformas");
+        
+        ProformaEstadisticasDTO estadisticas = proformaService.obtenerEstadisticas();
+        
+        return ResponseEntity.ok(
+            ApiResponseDTO.<ProformaEstadisticasDTO>builder()
+                .success(true)
+                .message("Estadísticas obtenidas")
+                .data(estadisticas)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+    
+    // ============================================
+    // MÉTODOS AUXILIARES
+    // ============================================
+    
+    private Long obtenerClienteId(Authentication authentication) {
+        return 1L; // Placeholder - implementar correctamente
+    }
+    
+    private Long obtenerAdminId(Authentication authentication) {
+        return 1L; // Placeholder - implementar correctamente
+    }
+}

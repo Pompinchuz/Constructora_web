@@ -1,4 +1,4 @@
-/* package com.constructora.backend.service;
+package com.constructora.backend.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,10 +14,12 @@ import com.constructora.backend.exception.NotFoundException;
 import com.constructora.backend.repository.ClienteRepository;
 import com.constructora.backend.repository.SolicitudProformaRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SolicitudProformaService {
     
     private final SolicitudProformaRepository solicitudRepository;
@@ -25,10 +27,11 @@ public class SolicitudProformaService {
     private final FileStorageService fileStorageService;
     private final EmailService emailService;
     
+    /**
+     * Crear nueva solicitud de proforma
+     */
     @Transactional
-    public SolicitudProformaResponseDTO crearSolicitud(
-            Long clienteId, 
-            SolicitudProformaDTO dto) {
+    public SolicitudProformaResponseDTO crearSolicitud(Long clienteId, SolicitudProformaDTO dto) {
         
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
@@ -41,12 +44,13 @@ public class SolicitudProformaService {
         
         // Guardar archivo adjunto si existe
         if (dto.getArchivo() != null && !dto.getArchivo().isEmpty()) {
-            String rutaArchivo = fileStorageService.guardarArchivo(
-                    dto.getArchivo(), "solicitudes");
+            String rutaArchivo = fileStorageService.guardarArchivo(dto.getArchivo(), "solicitudes");
             solicitud.setArchivoAdjunto(rutaArchivo);
         }
         
         solicitud = solicitudRepository.save(solicitud);
+        
+        log.info("Solicitud creada con ID: {}", solicitud.getId());
         
         // Notificar a administradores
         emailService.notificarNuevaSolicitud(solicitud);
@@ -54,21 +58,44 @@ public class SolicitudProformaService {
         return mapearAResponse(solicitud);
     }
     
-    @Transactional
+    /**
+     * Obtener solicitud por ID
+     */
+    @Transactional(readOnly = true)
+    public SolicitudProformaResponseDTO obtenerSolicitudPorId(Long id) {
+        SolicitudProforma solicitud = solicitudRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Solicitud no encontrada"));
+        
+        log.info("Solicitud {} obtenida", id);
+        
+        return mapearAResponse(solicitud);
+    }
+    
+    /**
+     * Obtener solicitudes por cliente
+     */
+    @Transactional(readOnly = true)
     public List<SolicitudProformaResponseDTO> obtenerSolicitudesPorCliente(Long clienteId) {
+        log.info("Obteniendo solicitudes del cliente {}", clienteId);
+        
         return solicitudRepository.findByClienteIdOrderByFechaSolicitudDesc(clienteId)
                 .stream()
                 .map(this::mapearAResponse)
                 .collect(Collectors.toList());
     }
     
-    @Transactional
+    /**
+     * Obtener todas las solicitudes (con filtro opcional por estado)
+     */
+    @Transactional(readOnly = true)
     public List<SolicitudProformaResponseDTO> obtenerTodasSolicitudes(EstadoSolicitud estado) {
         List<SolicitudProforma> solicitudes;
         
         if (estado != null) {
+            log.info("Obteniendo solicitudes con estado: {}", estado);
             solicitudes = solicitudRepository.findByEstadoOrderByFechaSolicitudDesc(estado);
         } else {
+            log.info("Obteniendo todas las solicitudes");
             solicitudes = solicitudRepository.findAllByOrderByFechaSolicitudDesc();
         }
         
@@ -77,6 +104,9 @@ public class SolicitudProformaService {
                 .collect(Collectors.toList());
     }
     
+    /**
+     * Cambiar estado de una solicitud
+     */
     @Transactional
     public SolicitudProformaResponseDTO cambiarEstado(
             Long solicitudId, 
@@ -87,6 +117,7 @@ public class SolicitudProformaService {
         SolicitudProforma solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new NotFoundException("Solicitud no encontrada"));
         
+        EstadoSolicitud estadoAnterior = solicitud.getEstado();
         solicitud.setEstado(nuevoEstado);
         solicitud.setFechaRevision(LocalDateTime.now());
         
@@ -96,13 +127,46 @@ public class SolicitudProformaService {
         
         solicitud = solicitudRepository.save(solicitud);
         
-        // Notificar al cliente
+        log.info("Solicitud {} cambió de estado {} a {}", 
+                solicitudId, estadoAnterior, nuevoEstado);
+        
+        // Notificar al cliente si fue rechazada
         if (nuevoEstado == EstadoSolicitud.RECHAZADA) {
             emailService.notificarSolicitudRechazada(solicitud);
         }
         
         return mapearAResponse(solicitud);
     }
+    
+    /**
+     * Contar solicitudes pendientes
+     */
+    @Transactional(readOnly = true)
+    public long contarSolicitudesPendientes() {
+        long count = solicitudRepository.countSolicitudesPendientes();
+        log.info("Total de solicitudes pendientes: {}", count);
+        return count;
+    }
+    
+    /**
+     * Contar solicitudes por estado
+     */
+    @Transactional(readOnly = true)
+    public long contarPorEstado(EstadoSolicitud estado) {
+        return solicitudRepository.countByEstado(estado);
+    }
+    
+    /**
+     * Contar solicitudes de un cliente
+     */
+    @Transactional(readOnly = true)
+    public long contarPorCliente(Long clienteId) {
+        return solicitudRepository.countByClienteId(clienteId);
+    }
+    
+    // ============================================
+    // MÉTODO DE MAPEO
+    // ============================================
     
     private SolicitudProformaResponseDTO mapearAResponse(SolicitudProforma solicitud) {
         return SolicitudProformaResponseDTO.builder()
@@ -119,4 +183,4 @@ public class SolicitudProformaService {
                 .clienteNombre(solicitud.getCliente().getNombreCompleto())
                 .build();
     }
-} */
+}
