@@ -8,7 +8,13 @@ package com.constructora.backend.controller;
 import com.constructora.backend.controller.dto.ApiResponseDTO;
 import com.constructora.backend.controller.dto.SolicitudProformaDTO;
 import com.constructora.backend.controller.dto.SolicitudProformaResponseDTO;
+import com.constructora.backend.entity.Administrador;
+import com.constructora.backend.entity.Cliente;
+import com.constructora.backend.entity.Usuario;
 import com.constructora.backend.entity.enums.EstadoSolicitud;
+import com.constructora.backend.repository.AdministradorRepository;
+import com.constructora.backend.repository.ClienteRepository;
+import com.constructora.backend.repository.UsuarioRepository;
 import com.constructora.backend.service.SolicitudProformaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +36,11 @@ import java.util.List;
 @Slf4j
 @CrossOrigin(origins = "${cors.allowed-origins}")
 public class SolicitudController {
-    
+
     private final SolicitudProformaService solicitudService;
+    private final UsuarioRepository usuarioRepository;
+    private final ClienteRepository clienteRepository;
+    private final AdministradorRepository administradorRepository;
     
     /**
      * Crear nueva solicitud de proforma (CLIENTE)
@@ -101,11 +110,32 @@ public class SolicitudController {
     public ResponseEntity<ApiResponseDTO<SolicitudProformaResponseDTO>> obtenerSolicitudPorId(
             @PathVariable Long id,
             Authentication authentication) {
-        
+
         log.info("Obteniendo solicitud ID: {}", id);
-        
+
         SolicitudProformaResponseDTO response = solicitudService.obtenerSolicitudPorId(id);
-        
+
+        // 🔒 SEGURIDAD: Validar que el cliente solo pueda ver sus propias solicitudes
+        if (authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("CLIENTE_NATURAL") ||
+                              a.getAuthority().equals("CLIENTE_JURIDICO"))) {
+
+            Long clienteId = obtenerClienteId(authentication);
+
+            // Verificar que la solicitud pertenece al cliente autenticado
+            if (!solicitudService.solicitudPerteneceACliente(id, clienteId)) {
+                log.warn("Cliente {} intentó acceder a solicitud {} que no le pertenece",
+                        clienteId, id);
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(
+                    ApiResponseDTO.<SolicitudProformaResponseDTO>builder()
+                        .success(false)
+                        .message("No tiene permisos para acceder a esta solicitud")
+                        .timestamp(LocalDateTime.now())
+                        .build()
+                );
+            }
+        }
+
         return ResponseEntity.ok(
             ApiResponseDTO.<SolicitudProformaResponseDTO>builder()
                 .success(true)
@@ -250,20 +280,53 @@ public class SolicitudController {
 
 
 
-    
-    
+
+
+
+
     // ============================================
     // MÉTODOS AUXILIARES
     // ============================================
-    
+
+    /**
+     * 🔒 SEGURIDAD: Obtiene el ID del cliente autenticado desde el Authentication
+     * @param authentication Objeto de autenticación de Spring Security
+     * @return ID del cliente
+     */
     private Long obtenerClienteId(Authentication authentication) {
-        // Extraer clienteId del token JWT o del contexto de seguridad
-        // Implementación depende de cómo almacenas el clienteId en el token
-        return 1L; // Placeholder - implementar correctamente
+        String email = authentication.getName(); // El correo está en el "name" del Authentication
+
+        // Buscar usuario por correo
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
+
+        // Buscar cliente por usuarioId
+        Cliente cliente = clienteRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado para usuario: " + email));
+
+        log.debug("Cliente ID {} obtenido para usuario {}", cliente.getId(), email);
+
+        return cliente.getId();
     }
-    
+
+    /**
+     * 🔒 SEGURIDAD: Obtiene el ID del administrador autenticado desde el Authentication
+     * @param authentication Objeto de autenticación de Spring Security
+     * @return ID del administrador
+     */
     private Long obtenerAdminId(Authentication authentication) {
-        // Extraer adminId del token JWT o del contexto de seguridad
-        return 1L; // Placeholder - implementar correctamente
+        String email = authentication.getName(); // El correo está en el "name" del Authentication
+
+        // Buscar usuario por correo
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
+
+        // Buscar administrador por usuarioId
+        Administrador administrador = administradorRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado para usuario: " + email));
+
+        log.debug("Administrador ID {} obtenido para usuario {}", administrador.getId(), email);
+
+        return administrador.getId();
     }
 }
