@@ -9,6 +9,7 @@ import { ContenidoService } from '../../../services/contenido.service';
 import { ProyectoService } from '../../../services/proyecto.service';
 import { NotificationService } from '../../../services/notification.service';
 import { Imagen, ProyectoExitoso, TipoImagen } from '../../models/contenido.models';
+import { environment } from '../../../../environments/environment';
 
 
 @Component({
@@ -19,6 +20,9 @@ import { Imagen, ProyectoExitoso, TipoImagen } from '../../models/contenido.mode
   styleUrl: './contenido-web.component.css'
 })
 export class ContenidoWebComponent implements OnInit {
+
+  // URL base para imágenes
+  readonly apiUrl = environment.apiUrl;
   
   // Tab activa
   activeTab: 'imagenes' | 'proyectos' = 'imagenes';
@@ -411,5 +415,18 @@ export class ContenidoWebComponent implements OnInit {
         }
       });
     }
+  }
+
+  // ============================================
+  // UTILIDADES
+  // ============================================
+
+  getFullImageUrl(urlImagen: string): string {
+    // Si la URL ya es completa (comienza con http), retornarla tal cual
+    if (urlImagen && urlImagen.startsWith('http')) {
+      return urlImagen;
+    }
+    // Si no, construir la URL completa con el dominio del API
+    return this.apiUrl + urlImagen;
   }
 }
