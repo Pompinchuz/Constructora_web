@@ -1,0 +1,432 @@
+<!-- ============================================ -->
+<!-- CONTENIDO-WEB.COMPONENT.HTML - COMPLETO -->
+<!-- ============================================ -->
+
+<div class="contenido-web-container">
+  <div class="container">
+    
+    <!-- Header -->
+    <div class="page-header">
+      <h1 class="page-title">Gestión de Contenido Web</h1>
+      <p class="page-subtitle">Administra las imágenes y proyectos que se muestran en la página pública</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button 
+        class="tab-btn"
+        [ngClass]="{'active': activeTab === 'imagenes'}"
+        (click)="activeTab = 'imagenes'">
+        <svg class="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        Imágenes
+      </button>
+      
+      <button 
+        class="tab-btn"
+        [ngClass]="{'active': activeTab === 'proyectos'}"
+        (click)="activeTab = 'proyectos'">
+        <svg class="tab-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        Proyectos Exitosos
+      </button>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- TAB: GESTIÓN DE IMÁGENES -->
+    <!-- ============================================ -->
+    <div *ngIf="activeTab === 'imagenes'" class="tab-content">
+      
+      <!-- Botón Agregar Imagen -->
+      <div class="action-bar">
+        <button class="btn-primary" (click)="abrirModalImagen()">
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Subir Nueva Imagen
+        </button>
+      </div>
+
+      <!-- Filtro por Tipo -->
+      <div class="filter-section">
+        <label class="filter-label">Filtrar por tipo:</label>
+        <select class="filter-select" [(ngModel)]="filtroTipoImagen" (change)="cargarImagenes()">
+          <option value="">Todas</option>
+          <option value="PORTADA">Portada</option>
+          <option value="SERVICIO">Servicios</option>
+          <option value="GALERIA">Galería</option>
+          <option value="SOBRE_NOSOTROS">Sobre Nosotros</option>
+        </select>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loadingImagenes" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando imágenes...</p>
+      </div>
+
+      <!-- Lista de Imágenes -->
+      <div *ngIf="!loadingImagenes && imagenes.length > 0" class="imagenes-grid">
+        <div *ngFor="let imagen of imagenes" class="imagen-card">
+          <div class="imagen-preview" [style.background-image]="'url(' + imagen.urlImagen + ')'">
+            <div class="imagen-overlay">
+              <button class="btn-icon-white" (click)="verImagen(imagen)" title="Ver">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+              <button class="btn-icon-white" (click)="editarImagen(imagen)" title="Editar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button class="btn-icon-white" (click)="eliminarImagen(imagen)" title="Eliminar">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+            <span class="badge" [ngClass]="'badge-' + imagen.tipo">
+              {{ imagen.tipo }}
+            </span>
+            <span class="status-badge" [ngClass]="imagen.activo ? 'badge-activo' : 'badge-inactivo'">
+              {{ imagen.activo ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+          <div class="imagen-info">
+            <h3 class="imagen-titulo">{{ imagen.titulo || 'Sin título' }}</h3>
+            <p class="imagen-descripcion">{{ imagen.descripcion || 'Sin descripción' }}</p>
+            <div class="imagen-meta">
+              <span class="meta-item">Orden: {{ imagen.orden }}</span>
+              <span class="meta-item">{{ imagen.fechaSubida | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sin imágenes -->
+      <div *ngIf="!loadingImagenes && imagenes.length === 0" class="empty-state">
+        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <p class="empty-text">No hay imágenes aún</p>
+        <button class="btn-primary" (click)="abrirModalImagen()">Subir Primera Imagen</button>
+      </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- TAB: GESTIÓN DE PROYECTOS -->
+    <!-- ============================================ -->
+    <div *ngIf="activeTab === 'proyectos'" class="tab-content">
+      
+      <!-- Botón Agregar Proyecto -->
+      <div class="action-bar">
+        <button class="btn-primary" (click)="abrirModalProyecto()">
+          <svg class="btn-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Crear Nuevo Proyecto
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loadingProyectos" class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando proyectos...</p>
+      </div>
+
+      <!-- Lista de Proyectos -->
+      <div *ngIf="!loadingProyectos && proyectos.length > 0" class="proyectos-list">
+        <div *ngFor="let proyecto of proyectos" class="proyecto-item">
+          <div class="proyecto-image" [style.background-image]="'url(' + proyecto.imagenPrincipal + ')'"></div>
+          <div class="proyecto-content">
+            <div class="proyecto-header">
+              <h3 class="proyecto-nombre">{{ proyecto.nombre }}</h3>
+              <span class="status-badge" [ngClass]="proyecto.activo ? 'badge-activo' : 'badge-inactivo'">
+                {{ proyecto.activo ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+            <p class="proyecto-ubicacion" *ngIf="proyecto.ubicacion">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              {{ proyecto.ubicacion }}
+            </p>
+            <p class="proyecto-descripcion">{{ proyecto.descripcion }}</p>
+            <div class="proyecto-meta">
+              <span *ngIf="proyecto.fechaFinalizacion">
+                Finalizado: {{ proyecto.fechaFinalizacion | date:'MMM yyyy' }}
+              </span>
+              <span *ngIf="proyecto.imagenes">
+                {{ proyecto.imagenes.length }} imágenes
+              </span>
+            </div>
+          </div>
+          <div class="proyecto-actions">
+            <button class="btn-icon-action" (click)="editarProyecto(proyecto)" title="Editar">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            </button>
+            <button class="btn-icon-action" (click)="toggleProyectoActivo(proyecto)" title="Activar/Desactivar">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+            <button class="btn-icon-action btn-danger" (click)="eliminarProyecto(proyecto)" title="Eliminar">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sin proyectos -->
+      <div *ngIf="!loadingProyectos && proyectos.length === 0" class="empty-state">
+        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        <p class="empty-text">No hay proyectos exitosos registrados</p>
+        <button class="btn-primary" (click)="abrirModalProyecto()">Crear Primer Proyecto</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL: SUBIR/EDITAR IMAGEN -->
+<!-- ============================================ -->
+<div *ngIf="mostrarModalImagen" class="modal-overlay" (click)="cerrarModalImagen()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        {{ modoEdicion ? 'Editar Imagen' : 'Subir Nueva Imagen' }}
+      </h2>
+      <button class="modal-close" (click)="cerrarModalImagen()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      
+      <!-- Tipo de Imagen -->
+      <div class="form-group">
+        <label class="form-label">Tipo de Imagen *</label>
+        <select class="form-select" [(ngModel)]="imagenForm.tipo">
+          <option value="PORTADA">Portada</option>
+          <option value="SERVICIO">Servicio</option>
+          <option value="GALERIA">Galería</option>
+          <option value="SOBRE_NOSOTROS">Sobre Nosotros</option>
+        </select>
+      </div>
+
+      <!-- Título -->
+      <div class="form-group">
+        <label class="form-label">Título</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="imagenForm.titulo"
+          placeholder="Título de la imagen">
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea 
+          class="form-textarea" 
+          [(ngModel)]="imagenForm.descripcion"
+          placeholder="Descripción de la imagen"
+          rows="3"></textarea>
+      </div>
+
+      <!-- Orden -->
+      <div class="form-group">
+        <label class="form-label">Orden</label>
+        <input 
+          type="number" 
+          class="form-input" 
+          [(ngModel)]="imagenForm.orden"
+          min="0"
+          placeholder="0">
+      </div>
+
+      <!-- Drag & Drop Area -->
+      <div class="form-group" *ngIf="!modoEdicion">
+        <label class="form-label">Archivo de Imagen *</label>
+        <div 
+          class="drag-drop-area"
+          [ngClass]="{'dragging': isDragging}"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)">
+          
+          <input 
+            type="file" 
+            #fileInput
+            accept="image/*"
+            (change)="onFileSelected($event)"
+            style="display: none;">
+          
+          <div *ngIf="!imagenForm.archivo" class="drag-drop-content">
+            <svg class="drag-drop-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+            <p class="drag-drop-text">Arrastra y suelta una imagen aquí</p>
+            <p class="drag-drop-subtext">o</p>
+            <button type="button" class="btn-secondary-small" (click)="fileInput.click()">
+              Seleccionar Archivo
+            </button>
+          </div>
+
+          <div *ngIf="imagenForm.archivo" class="file-selected">
+            <svg class="file-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <div class="file-info">
+              <p class="file-name">{{ imagenForm.archivo.name }}</p>
+              <p class="file-size">{{ (imagenForm.archivo.size / 1024 / 1024).toFixed(2) }} MB</p>
+            </div>
+            <button type="button" class="btn-remove" (click)="imagenForm.archivo = null; $event.stopPropagation()">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cerrarModalImagen()">
+        Cancelar
+      </button>
+      <button class="btn-primary" (click)="guardarImagen()">
+        {{ modoEdicion ? 'Actualizar' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL: CREAR/EDITAR PROYECTO -->
+<!-- ============================================ -->
+<div *ngIf="mostrarModalProyecto" class="modal-overlay" (click)="cerrarModalProyecto()">
+  <div class="modal-container modal-large" (click)="$event.stopPropagation()">
+    
+    <!-- Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        {{ modoEdicion ? 'Editar Proyecto' : 'Crear Nuevo Proyecto' }}
+      </h2>
+      <button class="modal-close" (click)="cerrarModalProyecto()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      
+      <!-- Nombre -->
+      <div class="form-group">
+        <label class="form-label">Nombre del Proyecto *</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="proyectoForm.nombre"
+          placeholder="Ej: Edificio Residencial Los Pinos">
+      </div>
+
+      <!-- Descripción -->
+      <div class="form-group">
+        <label class="form-label">Descripción</label>
+        <textarea 
+          class="form-textarea" 
+          [(ngModel)]="proyectoForm.descripcion"
+          placeholder="Descripción del proyecto"
+          rows="4"></textarea>
+      </div>
+
+      <!-- Ubicación -->
+      <div class="form-group">
+        <label class="form-label">Ubicación</label>
+        <input 
+          type="text" 
+          class="form-input" 
+          [(ngModel)]="proyectoForm.ubicacion"
+          placeholder="Ej: Chiclayo, Lambayeque">
+      </div>
+
+      <!-- Fechas -->
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Fecha de Inicio</label>
+          <input 
+            type="date" 
+            class="form-input" 
+            [(ngModel)]="proyectoForm.fechaInicio">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Fecha de Finalización</label>
+          <input 
+            type="date" 
+            class="form-input" 
+            [(ngModel)]="proyectoForm.fechaFinalizacion">
+        </div>
+      </div>
+
+      <!-- Imagen Principal -->
+      <div class="form-group">
+        <label class="form-label">Imagen Principal</label>
+        <input 
+          type="file" 
+          class="form-input-file" 
+          accept="image/*"
+          (change)="onImagenPrincipalSelected($event)">
+        <p class="form-hint" *ngIf="proyectoForm.imagenPrincipal">
+          Archivo seleccionado: {{ proyectoForm.imagenPrincipal.name }}
+        </p>
+      </div>
+
+      <!-- Imágenes Adicionales -->
+      <div class="form-group">
+        <label class="form-label">Imágenes Adicionales</label>
+        <input 
+          type="file" 
+          class="form-input-file" 
+          accept="image/*"
+          multiple
+          (change)="onImagenesAdicionalesSelected($event)">
+        <p class="form-hint" *ngIf="proyectoForm.imagenesAdicionales.length > 0">
+          {{ proyectoForm.imagenesAdicionales.length }} archivo(s) seleccionado(s)
+        </p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button class="btn-cancel" (click)="cerrarModalProyecto()">
+        Cancelar
+      </button>
+      <button class="btn-primary" (click)="guardarProyecto()">
+        {{ modoEdicion ? 'Actualizar' : 'Crear Proyecto' }}
+      </button>
+    </div>
+  </div>
+</div>
