@@ -22,6 +22,9 @@ import com.constructora.backend.repository.ClientePersonaJuridicaRepository;
 import com.constructora.backend.repository.ClientePersonaNaturalRepository;
 import com.constructora.backend.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -61,8 +64,12 @@ public class AuthService {
         cliente = clienteNaturalRepository.save(cliente);
         
         // Enviar correo de bienvenida
-        emailService.enviarCorreoBienvenida(usuario.getCorreoElectronico(), 
-                cliente.getNombreCompleto());
+        try {
+            emailService.enviarCorreoBienvenida(usuario.getCorreoElectronico(), 
+                    cliente.getNombreCompleto());
+        } catch (Exception e) {
+            log.warn("Error enviando correo de bienvenida: {}", e.getMessage());
+        }
         
         return mapearClienteNaturalAResponse(cliente);
     }
@@ -91,33 +98,73 @@ public class AuthService {
         cliente = clienteJuridicoRepository.save(cliente);
         
         // Enviar correo de bienvenida
-        emailService.enviarCorreoBienvenida(usuario.getCorreoElectronico(), 
-                cliente.getNombreCompleto());
+        try {
+            emailService.enviarCorreoBienvenida(usuario.getCorreoElectronico(), 
+                    cliente.getNombreCompleto());
+        } catch (Exception e) {
+            log.warn("Error enviando correo de bienvenida: {}", e.getMessage());
+        }
         
         return mapearClienteJuridicoAResponse(cliente);
     }
     
+    @Transactional
     public LoginResponseDTO login(LoginRequestDTO dto) {
-        Usuario usuario = usuarioRepository.findByCorreoElectronico(dto.getCorreoElectronico())
-                .orElseThrow(() -> new UnauthorizedException("Credenciales inválidas"));
+        log.info("Intento de login para: {}", dto.getCorreoElectronico());
         
+        // Buscar usuario
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(dto.getCorreoElectronico())
+                .orElseThrow(() -> {
+                    log.warn("Usuario no encontrado: {}", dto.getCorreoElectronico());
+                    return new UnauthorizedException("Credenciales inválidas");
+                });
+        
+        log.debug("Usuario encontrado - ID: {}", usuario.getId());
+        log.debug("Usuario activo: {}", usuario.getActivo());
+        
+        // Verificar que el usuario esté activo
         if (!usuario.getActivo()) {
+            log.warn("Usuario inactivo: {}", dto.getCorreoElectronico());
             throw new UnauthorizedException("Usuario inactivo");
         }
         
-        if (!passwordEncoder.matches(dto.getContrasena(), usuario.getContrasena())) {
+        // Verificar contraseña
+        boolean matches = passwordEncoder.matches(dto.getContrasena(), usuario.getContrasena());
+        log.debug("¿Contraseña coincide?: {}", matches);
+        
+        if (!matches) {
+            log.error("Contraseña incorrecta para: {}", dto.getCorreoElectronico());
             throw new UnauthorizedException("Credenciales inválidas");
         }
+        
+        log.info("Autenticación exitosa para: {}", dto.getCorreoElectronico());
         
         // Actualizar último acceso
         usuario.setUltimoAcceso(LocalDateTime.now());
         usuarioRepository.save(usuario);
         
-        // Generar token JWT
-        String token = jwtService.generarToken(usuario);
-        String nombreCompleto = obtenerNombreCompleto(usuario);
+        // Obtener nombre completo
+        String nombreCompleto;
+        try {
+            nombreCompleto = obtenerNombreCompleto(usuario);
+            log.debug("Nombre completo obtenido: {}", nombreCompleto);
+        } catch (Exception e) {
+            log.error("Error obteniendo nombre completo: {}", e.getMessage());
+            nombreCompleto = "Usuario";
+        }
         
-        return LoginResponseDTO.builder()
+        // Generar token JWT
+        String token;
+        try {
+            token = jwtService.generarToken(usuario);
+            log.debug("Token JWT generado exitosamente");
+        } catch (Exception e) {
+            log.error("Error generando token JWT: {}", e.getMessage(), e);
+            throw new RuntimeException("Error al generar token de autenticación");
+        }
+        
+        // Construir respuesta
+        LoginResponseDTO response = LoginResponseDTO.builder()
                 .token(token)
                 .tipoToken("Bearer")
                 .expiraEn(jwtService.getExpiracion())
@@ -125,6 +172,10 @@ public class AuthService {
                 .tipoUsuario(usuario.getTipoUsuario())
                 .nombreCompleto(nombreCompleto)
                 .build();
+        
+        log.info("Login completado exitosamente para: {}", dto.getCorreoElectronico());
+        
+        return response;
     }
     
     private void validarCorreoUnico(String correo) {
@@ -146,12 +197,19 @@ public class AuthService {
     }
     
     private String obtenerNombreCompleto(Usuario usuario) {
-        // Lógica para obtener nombre según tipo de usuario
+        log.debug("Obteniendo nombre para tipo: {}", usuario.getTipoUsuario());
+        
         return switch (usuario.getTipoUsuario()) {
-            case CLIENTE_NATURAL -> clienteNaturalRepository.findByUsuario(usuario)
-                    .map(ClientePersonaNatural::getNombreCompleto).orElse("");
-            case CLIENTE_JURIDICO -> clienteJuridicoRepository.findByUsuario(usuario)
-                    .map(ClientePersonaJuridica::getNombreCompleto).orElse("");
+            case CLIENTE_NATURAL -> {
+                var cliente = clienteNaturalRepository.findByUsuario(usuario)
+                        .orElseThrow(() -> new RuntimeException("Cliente natural no encontrado"));
+                yield cliente.getNombreCompleto();
+            }
+            case CLIENTE_JURIDICO -> {
+                var cliente = clienteJuridicoRepository.findByUsuario(usuario)
+                        .orElseThrow(() -> new RuntimeException("Cliente jurídico no encontrado"));
+                yield cliente.getNombreCompleto();
+            }
             case ADMINISTRADOR -> "Administrador";
         };
     }

@@ -13,62 +13,42 @@ import { ApiResponse } from '../components/models/api.models';
   providedIn: 'root'
 })
 export class ContenidoService {
+  
+  private apiUrl = `${environment.apiUrl}/api/contenido`;
 
-  private baseUrl = `${environment.apiUrl}/contenido`;
-
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   // ============================================
-  // IMÁGENES PÚBLICAS
+  // GESTIÓN DE IMÁGENES
   // ============================================
+
+  subirImagen(formData: FormData): Observable<ApiResponse<Imagen>> {
+    return this.http.post<ApiResponse<Imagen>>(`${this.apiUrl}/imagenes`, formData);
+  }
 
   obtenerImagenesPorTipo(tipo: TipoImagen): Observable<ApiResponse<Imagen[]>> {
-    return this.http.get<ApiResponse<Imagen[]>>(
-      `${this.baseUrl}/imagenes/publico/${tipo}`
-    );
+    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/tipo/${tipo}`);
+  }
+
+  obtenerImagenesActivasPorTipo(tipo: TipoImagen): Observable<ApiResponse<Imagen[]>> {
+    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/tipo/${tipo}/activas`);
+  }
+
+  obtenerTodasImagenes(): Observable<ApiResponse<Imagen[]>> {
+    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/admin`);
   }
 
   obtenerTodasImagenesPublicas(): Observable<ApiResponse<Imagen[]>> {
-    return this.http.get<ApiResponse<Imagen[]>>(
-      `${this.baseUrl}/imagenes/publico`
-    );
-  }
-
-  // ============================================
-  // IMÁGENES - ADMIN
-  // ============================================
-
-  obtenerTodasImagenes(): Observable<ApiResponse<Imagen[]>> {
-    return this.http.get<ApiResponse<Imagen[]>>(
-      `${this.baseUrl}/imagenes/admin`
-    );
-  }
-
-  subirImagen(formData: FormData): Observable<ApiResponse<Imagen>> {
-    return this.http.post<ApiResponse<Imagen>>(
-      `${this.baseUrl}/imagenes`,
-      formData
-    );
+    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/publico`);
   }
 
   actualizarImagen(id: number, formData: FormData): Observable<ApiResponse<Imagen>> {
-    return this.http.put<ApiResponse<Imagen>>(
-      `${this.baseUrl}/imagenes/${id}`,
-      formData
-    );
+    return this.http.put<ApiResponse<Imagen>>(`${this.apiUrl}/imagenes/${id}`, formData);
   }
 
   eliminarImagen(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(
-      `${this.baseUrl}/imagenes/${id}`
-    );
-  }
-
-  cambiarEstadoImagen(id: number, activo: boolean): Observable<ApiResponse<Imagen>> {
-    return this.http.put<ApiResponse<Imagen>>(
-      `${this.baseUrl}/imagenes/${id}`,
-      null,
-      { params: { activo: activo.toString() } }
-    );
+    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/imagenes/${id}`);
   }
 }
+
+

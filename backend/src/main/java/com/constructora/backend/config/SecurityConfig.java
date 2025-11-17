@@ -1,4 +1,3 @@
-// SecurityConfig.java
 package com.constructora.backend.config;
 
 import com.constructora.backend.service.CustomUserDetailsService;
@@ -19,12 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuración principal de Spring Security
- */
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // Habilita @PreAuthorize, @PostAuthorize, etc.
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     
@@ -32,62 +28,77 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final CorsConfig corsConfig;
     
-    /**
-     * Configuración de la cadena de filtros de seguridad
-     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Deshabilitar CSRF (no necesario para APIs REST stateless)
             .csrf(AbstractHttpConfigurer::disable)
-            
-            // Configurar CORS
             .cors(cors -> cors.configurationSource(corsConfig.corsConfigurationSource()))
-            
-            // Configurar autorización de peticiones
             .authorizeHttpRequests(auth -> auth
-                // Rutas públicas (sin autenticación)
+                // ============================================
+                // RUTAS PÚBLICAS (sin autenticación)
+                // ============================================
                 .requestMatchers(
+                    // Auth
                     "/api/auth/**",
+                    
+                    // Contenido público - CON /api/
                     "/api/contenido/imagenes/publico/**",
+                    "/api/contenido/imagenes/activas/**",
+                    "/api/contenido/imagenes/tipo/*/activas",
                     "/api/contenido/proyectos/publico/**",
+                    "/api/contenido/proyectos/activos",
+                    
+                    // Contenido público - SIN /api/ (por si acaso)
+                    "/contenido/imagenes/publico/**",
+                    "/contenido/proyectos/publico/**",
+                    "/contenido/proyectos/activos",
+                    
+                    // Archivos estáticos
                     "/api/files/public/**",
                     "/uploads/**",
+                    "/files/**",
+                    
+                    // Otros
                     "/error",
                     "/actuator/health"
                 ).permitAll()
                 
-                // Rutas de administrador
-                .requestMatchers("/api/*/admin/**").hasRole("ADMINISTRADOR")
+                // ============================================
+                // RUTAS DE ADMINISTRADOR
+                // ============================================
+                .requestMatchers(
+                    "/api/admin/**",
+                    "/api/*/admin/**",
+                    "/api/contenido/imagenes",
+                    "/api/contenido/imagenes/**",
+                    "/api/contenido/proyectos",
+                    "/api/contenido/proyectos/**"
+                ).hasAuthority("ADMINISTRADOR")
                 
-                // Rutas de cliente
+                // ============================================
+                // RUTAS DE CLIENTE
+                // ============================================
                 .requestMatchers(
                     "/api/solicitudes/mis-solicitudes",
                     "/api/proformas/mis-proformas",
-                    "/api/comprobantes/mis-comprobantes"
-                ).hasAnyRole("CLIENTE_NATURAL", "CLIENTE_JURIDICO")
+                    "/api/comprobantes/mis-comprobantes",
+                    "/api/cliente/**"
+                ).hasAnyAuthority("CLIENTE_NATURAL", "CLIENTE_JURIDICO")
                 
-                // Todas las demás rutas requieren autenticación
+                // ============================================
+                // RESTO DE RUTAS REQUIEREN AUTENTICACIÓN
+                // ============================================
                 .anyRequest().authenticated()
             )
-            
-            // Configurar manejo de sesiones (stateless para JWT)
             .sessionManagement(session -> 
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            
-            // Configurar el provider de autenticación
             .authenticationProvider(authenticationProvider())
-            
-            // Agregar el filtro JWT antes del filtro de autenticación por usuario/contraseña
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();
     }
     
-    /**
-     * Proveedor de autenticación personalizado
-     */
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -96,18 +107,12 @@ public class SecurityConfig {
         return authProvider;
     }
     
-    /**
-     * AuthenticationManager para manejar la autenticación
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) 
             throws Exception {
         return config.getAuthenticationManager();
     }
     
-    /**
-     * Encoder de contraseñas (BCrypt)
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

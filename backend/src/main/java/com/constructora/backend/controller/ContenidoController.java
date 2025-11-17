@@ -1,8 +1,7 @@
 // ============================================
-// CONTENIDO CONTROLLER (Imágenes y Proyectos)
+// CONTENIDO CONTROLLER - CORREGIDO
 // ============================================
 
-// ContenidoController.java
 package com.constructora.backend.controller;
 
 import com.constructora.backend.controller.dto.ApiResponseDTO;
@@ -37,16 +36,11 @@ public class ContenidoController {
     // ENDPOINTS PÚBLICOS
     // ============================================
     
-    /**
-     * Obtener imágenes por tipo (PÚBLICO)
-     * GET /api/contenido/imagenes/publico/{tipo}
-     */
     @GetMapping("/imagenes/publico/{tipo}")
     public ResponseEntity<ApiResponseDTO<List<ImagenResponseDTO>>> obtenerImagenesPublicas(
             @PathVariable TipoImagen tipo) {
         
         log.info("Obteniendo imágenes públicas de tipo: {}", tipo);
-        
         List<ImagenResponseDTO> imagenes = contenidoService.obtenerImagenesActivasPorTipo(tipo);
         
         return ResponseEntity.ok(
@@ -59,15 +53,10 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Obtener todas las imágenes activas (PÚBLICO)
-     * GET /api/contenido/imagenes/publico
-     */
     @GetMapping("/imagenes/publico")
     public ResponseEntity<ApiResponseDTO<List<ImagenResponseDTO>>> obtenerTodasImagenesPublicas() {
         
         log.info("Obteniendo todas las imágenes públicas");
-        
         List<ImagenResponseDTO> imagenes = contenidoService.obtenerTodasImagenesActivas();
         
         return ResponseEntity.ok(
@@ -80,15 +69,10 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Obtener proyectos exitosos activos (PÚBLICO)
-     * GET /api/contenido/proyectos/publico
-     */
     @GetMapping("/proyectos/publico")
     public ResponseEntity<ApiResponseDTO<List<ProyectoExitosoResponseDTO>>> obtenerProyectosPublicos() {
         
         log.info("Obteniendo proyectos exitosos públicos");
-        
         List<ProyectoExitosoResponseDTO> proyectos = contenidoService.obtenerProyectosActivos();
         
         return ResponseEntity.ok(
@@ -101,16 +85,11 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Obtener proyecto por ID (PÚBLICO)
-     * GET /api/contenido/proyectos/publico/{id}
-     */
     @GetMapping("/proyectos/publico/{id}")
     public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> obtenerProyectoPublicoPorId(
             @PathVariable Long id) {
         
         log.info("Obteniendo proyecto público ID: {}", id);
-        
         ProyectoExitosoResponseDTO proyecto = contenidoService.obtenerProyectoPorId(id);
         
         return ResponseEntity.ok(
@@ -124,15 +103,11 @@ public class ContenidoController {
     }
     
     // ============================================
-    // GESTIÓN DE IMÁGENES (ADMIN)
+    // GESTIÓN DE IMÁGENES (ADMIN) - USANDO hasAuthority
     // ============================================
     
-    /**
-     * Subir imagen (ADMIN)
-     * POST /api/contenido/imagenes
-     */
     @PostMapping(value = "/imagenes", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<ImagenResponseDTO>> subirImagen(
             @RequestParam("tipo") TipoImagen tipo,
             @RequestParam(value = "titulo", required = false) String titulo,
@@ -141,7 +116,6 @@ public class ContenidoController {
             @RequestParam(value = "orden", required = false, defaultValue = "0") Integer orden) {
         
         log.info("Admin subiendo imagen de tipo: {}", tipo);
-        
         ImagenResponseDTO response = contenidoService.subirImagen(tipo, titulo, descripcion, archivo, orden);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -154,17 +128,12 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Listar todas las imágenes (ADMIN)
-     * GET /api/contenido/imagenes/admin
-     */
     @GetMapping("/imagenes/admin")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<List<ImagenResponseDTO>>> listarTodasImagenes(
             @RequestParam(required = false) TipoImagen tipo) {
         
         log.info("Admin listando imágenes");
-        
         List<ImagenResponseDTO> imagenes = tipo != null 
             ? contenidoService.obtenerImagenesPorTipo(tipo)
             : contenidoService.obtenerTodasImagenes();
@@ -179,12 +148,8 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Actualizar imagen (ADMIN)
-     * PUT /api/contenido/imagenes/{id}
-     */
     @PutMapping("/imagenes/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<ImagenResponseDTO>> actualizarImagen(
             @PathVariable Long id,
             @RequestParam(required = false) String titulo,
@@ -193,7 +158,6 @@ public class ContenidoController {
             @RequestParam(required = false) Boolean activo) {
         
         log.info("Admin actualizando imagen ID: {}", id);
-        
         ImagenResponseDTO response = contenidoService.actualizarImagen(id, titulo, descripcion, orden, activo);
         
         return ResponseEntity.ok(
@@ -206,16 +170,11 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Eliminar imagen (ADMIN)
-     * DELETE /api/contenido/imagenes/{id}
-     */
     @DeleteMapping("/imagenes/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<Void>> eliminarImagen(@PathVariable Long id) {
         
         log.info("Admin eliminando imagen ID: {}", id);
-        
         contenidoService.eliminarImagen(id);
         
         return ResponseEntity.ok(
@@ -228,15 +187,11 @@ public class ContenidoController {
     }
     
     // ============================================
-    // GESTIÓN DE PROYECTOS (ADMIN)
+    // GESTIÓN DE PROYECTOS (ADMIN) - USANDO hasAuthority
     // ============================================
     
-    /**
-     * Crear proyecto exitoso (ADMIN)
-     * POST /api/contenido/proyectos
-     */
     @PostMapping(value = "/proyectos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> crearProyecto(
             @RequestParam("nombre") String nombre,
             @RequestParam(value = "descripcion", required = false) String descripcion,
@@ -253,12 +208,8 @@ public class ContenidoController {
         dto.setDescripcion(descripcion);
         dto.setUbicacion(ubicacion);
         
-        if (fechaInicio != null) {
-            dto.setFechaInicio(LocalDate.parse(fechaInicio));
-        }
-        if (fechaFinalizacion != null) {
-            dto.setFechaFinalizacion(LocalDate.parse(fechaFinalizacion));
-        }
+        if (fechaInicio != null) dto.setFechaInicio(LocalDate.parse(fechaInicio));
+        if (fechaFinalizacion != null) dto.setFechaFinalizacion(LocalDate.parse(fechaFinalizacion));
         
         dto.setImagenPrincipal(imagenPrincipal);
         dto.setImagenesAdicionales(imagenesAdicionales);
@@ -275,16 +226,11 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Listar todos los proyectos (ADMIN)
-     * GET /api/contenido/proyectos/admin
-     */
     @GetMapping("/proyectos/admin")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<List<ProyectoExitosoResponseDTO>>> listarTodosProyectos() {
         
         log.info("Admin listando todos los proyectos");
-        
         List<ProyectoExitosoResponseDTO> proyectos = contenidoService.obtenerTodosProyectos();
         
         return ResponseEntity.ok(
@@ -297,18 +243,13 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Actualizar proyecto (ADMIN)
-     * PUT /api/contenido/proyectos/{id}
-     */
     @PutMapping("/proyectos/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> actualizarProyecto(
             @PathVariable Long id,
             @RequestBody ProyectoExitosoDTO request) {
         
         log.info("Admin actualizando proyecto ID: {}", id);
-        
         ProyectoExitosoResponseDTO response = contenidoService.actualizarProyecto(id, request);
         
         return ResponseEntity.ok(
@@ -321,18 +262,13 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Activar/Desactivar proyecto (ADMIN)
-     * PATCH /api/contenido/proyectos/{id}/activo
-     */
     @PatchMapping("/proyectos/{id}/activo")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<Void>> cambiarEstadoProyecto(
             @PathVariable Long id,
             @RequestParam Boolean activo) {
         
         log.info("Admin cambiando estado de proyecto {} a {}", id, activo);
-        
         contenidoService.cambiarEstadoProyecto(id, activo);
         
         return ResponseEntity.ok(
@@ -344,16 +280,11 @@ public class ContenidoController {
         );
     }
     
-    /**
-     * Eliminar proyecto (ADMIN)
-     * DELETE /api/contenido/proyectos/{id}
-     */
     @DeleteMapping("/proyectos/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<Void>> eliminarProyecto(@PathVariable Long id) {
         
         log.info("Admin eliminando proyecto ID: {}", id);
-        
         contenidoService.eliminarProyecto(id);
         
         return ResponseEntity.ok(

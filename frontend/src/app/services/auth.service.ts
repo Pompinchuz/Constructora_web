@@ -1,23 +1,60 @@
 // ============================================
-// AUTH.SERVICE.TS - CORREGIDO PARA SSR
+// AUTH.SERVICE.TS - CON RUTAS CORRECTAS
 // ============================================
 
-// src/app/services/auth.service.ts
 import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-import { API_ENDPOINTS } from '../components/constants/api-endpoints';
 import { APP_CONSTANTS } from '../components/constants/app-constants';
-import { 
-  LoginRequest, 
-  LoginResponse, 
-  RegistroPersonaNatural, 
-  RegistroPersonaJuridica 
-} from '../components/models/auth.models';
-import { ApiResponse } from '../components/models/api.models';
+
+// ============================================
+// INTERFACES
+// ============================================
+
+export interface LoginRequest {
+  correoElectronico: string;
+  contrasena: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  tipoToken: string;
+  expiraEn: number;
+  correoElectronico: string;
+  tipoUsuario: string;
+  nombreCompleto: string;
+}
+
+export interface RegistroPersonaNatural {
+  correoElectronico: string;
+  contrasena: string;
+  nombres: string;
+  apellidos: string;
+  dni: string;
+  fechaNacimiento: string;
+  telefono: string;
+  direccion: string;
+}
+
+export interface RegistroPersonaJuridica {
+  correoElectronico: string;
+  contrasena: string;
+  razonSocial: string;
+  ruc: string;
+  representanteLegal: string;
+  telefono: string;
+  direccion: string;
+}
+
+export interface ApiResponse<T> {
+  success: boolean;
+  message: string;
+  data: T;
+  timestamp?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -26,6 +63,7 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
   private isBrowser: boolean;
+  private readonly API_URL = `${environment.apiUrl}/api/auth`;
 
   constructor(
     private http: HttpClient,
@@ -33,7 +71,6 @@ export class AuthService {
     @Inject(PLATFORM_ID) platformId: Object
   ) {
     this.isBrowser = isPlatformBrowser(platformId);
-    // Solo cargar del storage si estamos en el navegador
     if (this.isBrowser) {
       this.loadUserFromStorage();
     }
@@ -44,61 +81,95 @@ export class AuthService {
   // ============================================
 
   login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {
+    console.log('🔐 Intentando login con:', credentials.correoElectronico);
+    
     return this.http.post<ApiResponse<LoginResponse>>(
-      `${environment.apiUrl}${API_ENDPOINTS.AUTH.LOGIN}`,
+      `${this.API_URL}/login`,
       credentials
     ).pipe(
       tap(response => {
+        console.log('✅ Respuesta del backend:', response);
+        
         if (response.success && response.data) {
+          console.log('✅ Login exitoso, guardando sesión');
           this.setSession(response.data);
+        } else {
+          console.error('❌ Login falló:', response.message);
         }
+      }),
+      catchError(error => {
+        console.error('❌ Error en login:', error);
+        throw error;
       })
     );
   }
 
   registrarPersonaNatural(data: RegistroPersonaNatural): Observable<ApiResponse<any>> {
+    console.log('📝 Registrando persona natural:', data.correoElectronico);
+    
     return this.http.post<ApiResponse<any>>(
-      `${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER_NATURAL}`,
+      `${this.API_URL}/registro/persona-natural`,
       data
+    ).pipe(
+      tap(response => {
+        console.log('✅ Registro exitoso:', response);
+      }),
+      catchError(error => {
+        console.error('❌ Error en registro:', error);
+        throw error;
+      })
     );
   }
 
   registrarPersonaJuridica(data: RegistroPersonaJuridica): Observable<ApiResponse<any>> {
+    console.log('📝 Registrando persona jurídica:', data.correoElectronico);
+    
     return this.http.post<ApiResponse<any>>(
-      `${environment.apiUrl}${API_ENDPOINTS.AUTH.REGISTER_JURIDICO}`,
+      `${this.API_URL}/registro/persona-juridica`,
       data
+    ).pipe(
+      tap(response => {
+        console.log('✅ Registro exitoso:', response);
+      }),
+      catchError(error => {
+        console.error('❌ Error en registro:', error);
+        throw error;
+      })
     );
   }
 
   logout(): void {
+    console.log('🚪 Cerrando sesión');
+    
     if (this.isBrowser) {
       localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN);
       localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER);
       localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE);
     }
+    
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
 
   // ============================================
-  // VALIDACIONES
+  // VALIDACIONES - RUTAS CORRECTAS DEL BACKEND
   // ============================================
 
   checkEmailAvailability(email: string): Observable<ApiResponse<boolean>> {
     return this.http.get<ApiResponse<boolean>>(
-      `${environment.apiUrl}${API_ENDPOINTS.AUTH.CHECK_EMAIL}?email=${email}`
+      `${this.API_URL}/check-email?email=${email}`
     );
   }
 
   checkDniAvailability(dni: string): Observable<ApiResponse<boolean>> {
     return this.http.get<ApiResponse<boolean>>(
-      `${environment.apiUrl}${API_ENDPOINTS.AUTH.CHECK_DNI}?dni=${dni}`
+      `${this.API_URL}/check-dni?dni=${dni}`
     );
   }
 
   checkRucAvailability(ruc: string): Observable<ApiResponse<boolean>> {
     return this.http.get<ApiResponse<boolean>>(
-      `${environment.apiUrl}${API_ENDPOINTS.AUTH.CHECK_RUC}?ruc=${ruc}`
+      `${this.API_URL}/check-ruc?ruc=${ruc}`
     );
   }
 
@@ -108,6 +179,8 @@ export class AuthService {
 
   private setSession(authResult: LoginResponse): void {
     if (!this.isBrowser) return;
+
+    console.log('💾 Guardando sesión:', authResult);
 
     localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN, authResult.token);
     localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE, authResult.tipoUsuario);
@@ -120,6 +193,8 @@ export class AuthService {
     
     localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(userData));
     this.currentUserSubject.next(userData);
+
+    console.log('✅ Sesión guardada exitosamente');
   }
 
   private loadUserFromStorage(): void {
@@ -130,7 +205,9 @@ export class AuthService {
       try {
         const user = JSON.parse(userStr);
         this.currentUserSubject.next(user);
+        console.log('✅ Usuario cargado desde storage:', user);
       } catch (e) {
+        console.error('❌ Error parseando usuario:', e);
         this.logout();
       }
     }
@@ -166,5 +243,13 @@ export class AuthService {
   isCliente(): boolean {
     return this.hasRole(APP_CONSTANTS.ROLES.CLIENTE_NATURAL) || 
            this.hasRole(APP_CONSTANTS.ROLES.CLIENTE_JURIDICO);
+  }
+
+  isClienteNatural(): boolean {
+    return this.hasRole(APP_CONSTANTS.ROLES.CLIENTE_NATURAL);
+  }
+
+  isClienteJuridico(): boolean {
+    return this.hasRole(APP_CONSTANTS.ROLES.CLIENTE_JURIDICO);
   }
 }
