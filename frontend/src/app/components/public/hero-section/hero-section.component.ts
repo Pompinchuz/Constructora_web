@@ -7,6 +7,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { ContenidoService } from '../../../services/contenido.service';
 import { environment } from '../../../../environments/environment';
+import { TipoImagen } from '../../models/contenido.models';
 
 @Component({
   selector: 'app-hero-section',
@@ -33,7 +34,7 @@ export class HeroSectionComponent implements OnInit {
   }
 
   cargarImagenPortada(): void {
-    this.contenidoService.obtenerImagenesActivasPorTipo('PORTADA').subscribe({
+    this.contenidoService.obtenerImagenesActivasPorTipo(TipoImagen.PORTADA).subscribe({
       next: (response) => {
         if (response.success && response.data && response.data.length > 0) {
           // Tomar la primera imagen activa de tipo PORTADA

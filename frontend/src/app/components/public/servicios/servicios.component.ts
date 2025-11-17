@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ContenidoService } from '../../../services/contenido.service';
 import { environment } from '../../../../environments/environment';
+import { TipoImagen } from '../../models/contenido.models';
 
 interface Servicio {
   icono: string;
@@ -84,7 +85,7 @@ export class ServiciosComponent implements OnInit {
   }
 
   cargarImagenesServicio(): void {
-    this.contenidoService.obtenerImagenesActivasPorTipo('SERVICIO').subscribe({
+    this.contenidoService.obtenerImagenesActivasPorTipo(TipoImagen.SERVICIO).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           // Asignar imágenes a los servicios

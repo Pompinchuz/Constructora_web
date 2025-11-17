@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContenidoService } from '../../../services/contenido.service';
 import { environment } from '../../../../environments/environment';
+import { TipoImagen } from '../../models/contenido.models';
 
 interface Valor {
   icono: string;
@@ -61,7 +62,7 @@ export class SobreNosotrosComponent implements OnInit {
   }
 
   cargarImagenesSobreNosotros(): void {
-    this.contenidoService.obtenerImagenesActivasPorTipo('SOBRE_NOSOTROS').subscribe({
+    this.contenidoService.obtenerImagenesActivasPorTipo(TipoImagen.SOBRE_NOSOTROS).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.imagenesSobreNosotros = response.data.map(img => this.getFullImageUrl(img.urlImagen));

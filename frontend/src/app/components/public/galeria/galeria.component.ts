@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ContenidoService } from '../../../services/contenido.service';
 import { environment } from '../../../../environments/environment';
+import { TipoImagen } from '../../models/contenido.models';
 
 @Component({
   selector: 'app-galeria',
@@ -27,7 +28,7 @@ export class GaleriaComponent implements OnInit {
 
   cargarImagenesGaleria(): void {
     this.loading = true;
-    this.contenidoService.obtenerImagenesActivasPorTipo('GALERIA').subscribe({
+    this.contenidoService.obtenerImagenesActivasPorTipo(TipoImagen.GALERIA).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.imagenesGaleria = response.data.map(img => this.getFullImageUrl(img.urlImagen));
