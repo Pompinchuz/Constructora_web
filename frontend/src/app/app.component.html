@@ -1,13 +1,42 @@
+<!-- ============================================ -->
+<!-- APP.COMPONENT.HTML - Actualizado -->
+<!-- ============================================ -->
 
-<div class="app">
-  
-
-    <nav>
-  
-    </nav>
-  
-    <router-outlet></router-outlet> 
+<!-- Loading Spinner Global -->
+<div *ngIf="loading$ | async" 
+     class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+  <div class="bg-white rounded-lg p-6">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+    <p class="mt-4 text-gray-700">Cargando...</p>
   </div>
-  
+</div>
 
-  <router-outlet>
+<!-- Notificaciones Toast -->
+<div *ngIf="notification" 
+     class="fixed top-4 right-4 z-50 max-w-md animate-slide-in">
+  <div class="rounded-lg shadow-lg p-4 flex items-start"
+       [ngClass]="{
+         'bg-green-50 border-l-4 border-green-500': notification.type === 'success',
+         'bg-red-50 border-l-4 border-red-500': notification.type === 'error',
+         'bg-yellow-50 border-l-4 border-yellow-500': notification.type === 'warning',
+         'bg-blue-50 border-l-4 border-blue-500': notification.type === 'info'
+       }">
+    <div class="flex-1">
+      <p class="font-medium"
+         [ngClass]="{
+           'text-green-800': notification.type === 'success',
+           'text-red-800': notification.type === 'error',
+           'text-yellow-800': notification.type === 'warning',
+           'text-blue-800': notification.type === 'info'
+         }">
+        {{ notification.message }}
+      </p>
+    </div>
+    <button (click)="closeNotification()" class="ml-4 text-gray-400 hover:text-gray-600">
+      ✕
+    </button>
+  </div>
+</div>
+
+<!-- Contenido Principal -->
+<router-outlet></router-outlet>

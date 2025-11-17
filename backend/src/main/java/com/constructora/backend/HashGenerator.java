@@ -8,7 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class HashGenerator {
     public static void main(String[] args) {
-        String rawPassword = "Admin12345";
+        String rawPassword = "Papas_1234";
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String hash = encoder.encode(rawPassword);
         System.out.println("BCrypt: " + hash);
