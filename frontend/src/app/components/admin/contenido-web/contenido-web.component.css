@@ -296,6 +296,10 @@
   background-position: center;
   background-color: #f3f4f6;
   border-radius: 0.5rem;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .proyecto-content {
