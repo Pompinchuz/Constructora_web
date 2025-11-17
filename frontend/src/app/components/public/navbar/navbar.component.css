@@ -1,0 +1,279 @@
+/* ============================================ */
+/* NAVBAR.COMPONENT.CSS - Estilos Puros */
+/* ============================================ */
+
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+  }
+  
+  .navbar.transparent {
+    background-color: transparent;
+  }
+  
+  .navbar.scrolled {
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .navbar-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  .navbar-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 5rem;
+  }
+  
+  /* Logo */
+  .navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .navbar-logo img {
+    height: 3rem;
+    width: auto;
+  }
+  
+  .navbar-logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+  
+  .navbar.transparent .navbar-logo-text {
+    color: white;
+  }
+  
+  .navbar.scrolled .navbar-logo-text {
+    color: #1f2937;
+  }
+  
+  /* Desktop Menu */
+  .navbar-menu {
+    display: none;
+    align-items: center;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .navbar-menu {
+      display: flex;
+    }
+  }
+  
+  .navbar-link {
+    cursor: pointer;
+    font-size: 1.125rem;
+    font-weight: 500;
+    transition: color 0.3s;
+    text-decoration: none;
+  }
+  
+  .navbar.transparent .navbar-link {
+    color: white;
+  }
+  
+  .navbar.scrolled .navbar-link {
+    color: #374151;
+  }
+  
+  .navbar-link:hover {
+    color: #2563eb;
+  }
+  
+  /* Auth Buttons */
+  .navbar-auth {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .btn-login {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    border: 2px solid #2563eb;
+    transition: all 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .navbar.transparent .btn-login {
+    color: white;
+    border-color: white;
+    background-color: transparent;
+  }
+  
+  .navbar.scrolled .btn-login {
+    color: #2563eb;
+    border-color: #2563eb;
+    background-color: transparent;
+  }
+  
+  .btn-login:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+  }
+  
+  .btn-register {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: white;
+    background-color: #2563eb;
+    border-radius: 0.5rem;
+    border: none;
+    transition: background-color 0.3s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  
+  .btn-register:hover {
+    background-color: #1d4ed8;
+  }
+  
+  /* User Info */
+  .navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .navbar-username {
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  .navbar.transparent .navbar-username {
+    color: white;
+  }
+  
+  .navbar.scrolled .navbar-username {
+    color: #374151;
+  }
+  
+  .btn-logout {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #dc2626;
+    background-color: #fef2f2;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .btn-logout:hover {
+    background-color: #fee2e2;
+  }
+  
+  /* Mobile Menu Button */
+  .navbar-mobile-btn {
+    display: block;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  @media (min-width: 768px) {
+    .navbar-mobile-btn {
+      display: none;
+    }
+  }
+  
+  .navbar.transparent .navbar-mobile-btn {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .navbar.scrolled .navbar-mobile-btn {
+    color: #374151;
+    background-color: transparent;
+  }
+  
+  .navbar-mobile-btn:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+  }
+  
+  .navbar-mobile-btn svg {
+    height: 1.5rem;
+    width: 1.5rem;
+  }
+  
+  /* Mobile Menu */
+  .navbar-mobile-menu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .navbar-mobile-menu.open {
+    max-height: 24rem;
+    padding-bottom: 1rem;
+  }
+  
+  .navbar-mobile-menu-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(229, 231, 235, 0.2);
+  }
+  
+  .navbar.scrolled .navbar-mobile-menu-items {
+    border-top-color: #e5e7eb;
+  }
+  
+  .navbar-mobile-link {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+  }
+  
+  .navbar.transparent .navbar-mobile-link {
+    color: white;
+  }
+  
+  .navbar.scrolled .navbar-mobile-link {
+    color: #374151;
+  }
+  
+  .navbar-mobile-link:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+  }
+  
+  .navbar-mobile-auth {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+  }
+  
+  .navbar-mobile-auth .btn-login,
+  .navbar-mobile-auth .btn-register {
+    display: block;
+    text-align: center;
+  }
+  
+  /* Spacer */
+  .navbar-spacer {
+    height: 5rem;
+  }
