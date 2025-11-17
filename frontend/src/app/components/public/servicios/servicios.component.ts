@@ -1,16 +1,19 @@
 // ============================================
-// SERVICIOS.COMPONENT.TS
+// SERVICIOS.COMPONENT.TS - Con imágenes dinámicas
 // ============================================
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ContenidoService } from '../../../services/contenido.service';
+import { environment } from '../../../../environments/environment';
 
 interface Servicio {
   icono: string;
   titulo: string;
   descripcion: string;
   caracteristicas: string[];
+  imagen?: string; // Imagen dinámica desde backend
 }
 
 @Component({
@@ -20,7 +23,9 @@ interface Servicio {
   templateUrl: './servicios.component.html',
   styleUrl: './servicios.component.css'
 })
-export class ServiciosComponent {
+export class ServiciosComponent implements OnInit {
+  readonly apiUrl = environment.apiUrl;
+  imagenesServicio: string[] = [];
   
   servicios: Servicio[] = [
     {
@@ -69,7 +74,42 @@ export class ServiciosComponent {
     }
   ];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private contenidoService: ContenidoService
+  ) {}
+
+  ngOnInit(): void {
+    this.cargarImagenesServicio();
+  }
+
+  cargarImagenesServicio(): void {
+    this.contenidoService.obtenerImagenesActivasPorTipo('SERVICIO').subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          // Asignar imágenes a los servicios
+          this.imagenesServicio = response.data.map(img => this.getFullImageUrl(img.urlImagen));
+
+          // Asignar imágenes a cada servicio (según el orden)
+          this.servicios.forEach((servicio, index) => {
+            if (this.imagenesServicio[index]) {
+              servicio.imagen = this.imagenesServicio[index];
+            }
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando imágenes de servicios:', error);
+      }
+    });
+  }
+
+  getFullImageUrl(urlImagen: string): string {
+    if (urlImagen && urlImagen.startsWith('http')) {
+      return urlImagen;
+    }
+    return this.apiUrl + urlImagen;
+  }
 
   solicitarProforma(): void {
     this.router.navigate(['/registro-tipo']);
