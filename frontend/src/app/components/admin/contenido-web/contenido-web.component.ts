@@ -83,11 +83,11 @@ export class ContenidoWebComponent implements OnInit {
 
   cargarImagenes(): void {
     this.loadingImagenes = true;
-    
-    const observable = this.filtroTipoImagen 
+
+    const observable = this.filtroTipoImagen
       ? this.contenidoService.obtenerImagenesPorTipo(this.filtroTipoImagen as TipoImagen)
-      : this.contenidoService.obtenerTodasImagenesPublicas();
-    
+      : this.contenidoService.obtenerTodasImagenes();
+
     observable.subscribe({
       next: (response) => {
         if (response.success) {
@@ -248,11 +248,18 @@ export class ContenidoWebComponent implements OnInit {
 
   cargarProyectos(): void {
     this.loadingProyectos = true;
-    
+
     this.proyectoService.obtenerTodosProyectos().subscribe({
       next: (response) => {
         if (response.success) {
-          this.proyectos = response.data || [];
+          // Construir URLs completas para imágenes
+          this.proyectos = (response.data || []).map(proyecto => ({
+            ...proyecto,
+            imagenPrincipal: proyecto.imagenPrincipal
+              ? this.getFullImageUrl(proyecto.imagenPrincipal)
+              : undefined,
+            imagenes: proyecto.imagenes.map(img => this.getFullImageUrl(img))
+          }));
         }
         this.loadingProyectos = false;
       },
