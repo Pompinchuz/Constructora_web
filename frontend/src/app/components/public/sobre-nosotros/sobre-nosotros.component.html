@@ -1,0 +1,119 @@
+<!-- ============================================ -->
+<!-- SOBRE-NOSOTROS.COMPONENT.HTML -->
+<!-- ============================================ -->
+
+<div class="py-20 bg-gradient-to-br from-blue-50 to-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Header de la sección -->
+      <div class="text-center mb-16">
+        <h2 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          Sobre Nosotros
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Somos una empresa constructora con más de 10 años de experiencia, comprometida con la excelencia en cada proyecto
+        </p>
+      </div>
+  
+      <!-- Historia y Misión -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
+        
+        <!-- Historia -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="flex items-center mb-6">
+            <div class="bg-blue-100 rounded-full p-3 mr-4">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900">Nuestra Historia</h3>
+          </div>
+          <p class="text-gray-600 leading-relaxed mb-4">
+            Fundada en 2014, nuestra constructora ha crecido de un pequeño equipo de profesionales apasionados a una empresa reconocida en el sector de la construcción.
+          </p>
+          <p class="text-gray-600 leading-relaxed">
+            Cada proyecto que realizamos refleja nuestro compromiso con la calidad, innovación y satisfacción del cliente. Hemos construido no solo edificaciones, sino relaciones duraderas basadas en la confianza.
+          </p>
+        </div>
+  
+        <!-- Misión y Visión -->
+        <div class="bg-white rounded-xl shadow-lg p-8">
+          <div class="flex items-center mb-6">
+            <div class="bg-blue-100 rounded-full p-3 mr-4">
+              <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </div>
+            <h3 class="text-2xl font-bold text-gray-900">Misión y Visión</h3>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Misión</h4>
+              <p class="text-gray-600 leading-relaxed">
+                Proporcionar servicios de construcción de alta calidad, superando las expectativas de nuestros clientes mediante la innovación, el profesionalismo y el compromiso con la excelencia.
+              </p>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-900 mb-2">Visión</h4>
+              <p class="text-gray-600 leading-relaxed">
+                Ser la constructora líder reconocida por nuestra calidad, innovación y responsabilidad social en el sector de la construcción.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Nuestros Valores -->
+      <div class="mb-20">
+        <h3 class="text-3xl font-bold text-gray-900 text-center mb-12">
+          Nuestros Valores
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div 
+            *ngFor="let valor of valores"
+            class="bg-white rounded-xl shadow-lg p-6 text-center hover:shadow-xl transition-shadow duration-300">
+            
+            <!-- Icono -->
+            <div class="flex justify-center mb-4">
+              <div class="bg-blue-100 rounded-full p-4">
+                <svg class="h-10 w-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path 
+                    stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    stroke-width="2" 
+                    [attr.d]="valor.icono"/>
+                </svg>
+              </div>
+            </div>
+  
+            <!-- Título -->
+            <h4 class="text-xl font-bold text-gray-900 mb-3">
+              {{ valor.titulo }}
+            </h4>
+  
+            <!-- Descripción -->
+            <p class="text-gray-600 text-sm leading-relaxed">
+              {{ valor.descripcion }}
+            </p>
+          </div>
+        </div>
+      </div>
+  
+      <!-- Estadísticas -->
+      <div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl shadow-2xl p-12">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-8">
+          <div 
+            *ngFor="let stat of estadisticas"
+            class="text-center">
+            <div class="text-4xl md:text-5xl font-bold text-white mb-2">
+              {{ stat.numero }}
+            </div>
+            <div class="text-blue-100 font-medium">
+              {{ stat.label }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

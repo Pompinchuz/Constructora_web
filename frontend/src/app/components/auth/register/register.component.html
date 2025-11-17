@@ -1,0 +1,203 @@
+<!-- src/app/components/auth/register/register.component.html -->
+<div class="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+      <!-- Header -->
+      <div class="text-center">
+        <h2 class="mt-6 text-3xl font-extrabold text-gray-900">
+          Registrarse como {{ tipoCliente === 'natural' ? 'Persona Natural' : 'Empresa' }}
+        </h2>
+        <p class="mt-2 text-sm text-gray-600">
+          ¿Ya tienes cuenta?
+          <a routerLink="/login" class="font-medium text-blue-600 hover:text-blue-500">
+            Inicia sesión
+          </a>
+        </p>
+      </div>
+  
+      <!-- Formulario -->
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="mt-8 space-y-6">
+        
+        <!-- Campos para Persona Natural -->
+        <div *ngIf="tipoCliente === 'natural'">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Nombres *</label>
+              <input
+                type="text"
+                formControlName="nombres"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                [class.border-red-500]="nombres?.invalid && nombres?.touched"
+              />
+              <div *ngIf="nombres?.invalid && nombres?.touched" class="mt-1 text-sm text-red-600">
+                <span *ngIf="nombres?.errors?.['required']">Obligatorio</span>
+              </div>
+            </div>
+  
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Apellidos *</label>
+              <input
+                type="text"
+                formControlName="apellidos"
+                class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                [class.border-red-500]="apellidos?.invalid && apellidos?.touched"
+              />
+              <div *ngIf="apellidos?.invalid && apellidos?.touched" class="mt-1 text-sm text-red-600">
+                <span *ngIf="apellidos?.errors?.['required']">Obligatorio</span>
+              </div>
+            </div>
+          </div>
+  
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700">DNI</label>
+            <input
+              type="text"
+              formControlName="dni"
+              maxlength="8"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="dni?.invalid && dni?.touched"
+              placeholder="12345678"
+            />
+            <div *ngIf="dni?.invalid && dni?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="dni?.errors?.['pattern']">DNI debe tener 8 dígitos</span>
+            </div>
+          </div>
+        </div>
+  
+        <!-- Campos para Persona Jurídica -->
+        <div *ngIf="tipoCliente === 'juridico'">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Razón Social *</label>
+            <input
+              type="text"
+              formControlName="razonSocial"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="razonSocial?.invalid && razonSocial?.touched"
+            />
+            <div *ngIf="razonSocial?.invalid && razonSocial?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="razonSocial?.errors?.['required']">Obligatorio</span>
+            </div>
+          </div>
+  
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700">RUC *</label>
+            <input
+              type="text"
+              formControlName="ruc"
+              maxlength="11"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="ruc?.invalid && ruc?.touched"
+              placeholder="20123456789"
+            />
+            <div *ngIf="ruc?.invalid && ruc?.touched" class="mt-1 text-sm text-red-600">
+              <span *ngIf="ruc?.errors?.['required']">Obligatorio</span>
+              <span *ngIf="ruc?.errors?.['pattern']">RUC debe tener 11 dígitos</span>
+            </div>
+          </div>
+  
+          <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700">Representante Legal</label>
+            <input
+              type="text"
+              formControlName="representanteLegal"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+  
+        <!-- Campos comunes -->
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">Correo Electrónico *</label>
+          <input
+            type="email"
+            formControlName="correoElectronico"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="correo?.invalid && correo?.touched"
+          />
+          <div *ngIf="correo?.invalid && correo?.touched" class="mt-1 text-sm text-red-600">
+            <span *ngIf="correo?.errors?.['required']">Obligatorio</span>
+            <span *ngIf="correo?.errors?.['email']">Correo inválido</span>
+          </div>
+        </div>
+  
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">Teléfono</label>
+          <input
+            type="text"
+            formControlName="telefono"
+            maxlength="9"
+            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            [class.border-red-500]="telefono?.invalid && telefono?.touched"
+            placeholder="987654321"
+          />
+          <div *ngIf="telefono?.invalid && telefono?.touched" class="mt-1 text-sm text-red-600">
+            <span *ngIf="telefono?.errors?.['pattern']">Teléfono debe tener 9 dígitos</span>
+          </div>
+        </div>
+  
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">Contraseña *</label>
+          <div class="relative">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              formControlName="contrasena"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="contrasena?.invalid && contrasena?.touched"
+            />
+            <button
+              type="button"
+              (click)="togglePasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <span *ngIf="!showPassword">👁️</span>
+              <span *ngIf="showPassword">🙈</span>
+            </button>
+          </div>
+          <div *ngIf="contrasena?.invalid && contrasena?.touched" class="mt-1 text-sm text-red-600">
+            <span *ngIf="contrasena?.errors?.['required']">Obligatorio</span>
+            <span *ngIf="contrasena?.errors?.['minlength']">Mínimo 8 caracteres</span>
+          </div>
+        </div>
+  
+        <div class="mt-4">
+          <label class="block text-sm font-medium text-gray-700">Confirmar Contraseña *</label>
+          <div class="relative">
+            <input
+              [type]="showConfirmPassword ? 'text' : 'password'"
+              formControlName="confirmarContrasena"
+              class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              [class.border-red-500]="(confirmarContrasena?.invalid && confirmarContrasena?.touched) || (registerForm.errors?.['passwordMismatch'] && confirmarContrasena?.touched)"
+            />
+            <button
+              type="button"
+              (click)="toggleConfirmPasswordVisibility()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+            >
+              <span *ngIf="!showConfirmPassword">👁️</span>
+              <span *ngIf="showConfirmPassword">🙈</span>
+            </button>
+          </div>
+          <div *ngIf="registerForm.errors?.['passwordMismatch'] && confirmarContrasena?.touched" class="mt-1 text-sm text-red-600">
+            Las contraseñas no coinciden
+          </div>
+        </div>
+  
+        <!-- Botón Submit -->
+        <div class="mt-6">
+          <button
+            type="submit"
+            [disabled]="loading"
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+          >
+            <span *ngIf="!loading">Registrarse</span>
+            <span *ngIf="loading">Registrando...</span>
+          </button>
+        </div>
+      </form>
+  
+      <div class="text-center mt-4">
+        <a routerLink="/registro-tipo" class="text-sm text-gray-600 hover:text-gray-900">
+          ← Cambiar tipo de registro
+        </a>
+      </div>
+    </div>
+  </div>
