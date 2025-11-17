@@ -140,13 +140,13 @@ export class AuthService {
 
   logout(): void {
     console.log('🚪 Cerrando sesión');
-    
+
     if (this.isBrowser) {
-      localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN);
-      localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER);
-      localStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE);
+      sessionStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN);
+      sessionStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER);
+      sessionStorage.removeItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE);
     }
-    
+
     this.currentUserSubject.next(null);
     this.router.navigate(['/login']);
   }
@@ -180,32 +180,33 @@ export class AuthService {
   private setSession(authResult: LoginResponse): void {
     if (!this.isBrowser) return;
 
-    console.log('💾 Guardando sesión:', authResult);
+    console.log('💾 Guardando sesión en sessionStorage:', authResult);
 
-    localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN, authResult.token);
-    localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE, authResult.tipoUsuario);
-    
+    // Usar sessionStorage en lugar de localStorage por seguridad
+    sessionStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN, authResult.token);
+    sessionStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE, authResult.tipoUsuario);
+
     const userData = {
       correo: authResult.correoElectronico,
       nombre: authResult.nombreCompleto,
       tipo: authResult.tipoUsuario
     };
-    
-    localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(userData));
+
+    sessionStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.USER, JSON.stringify(userData));
     this.currentUserSubject.next(userData);
 
-    console.log('✅ Sesión guardada exitosamente');
+    console.log('✅ Sesión guardada exitosamente en sessionStorage');
   }
 
   private loadUserFromStorage(): void {
     if (!this.isBrowser) return;
 
-    const userStr = localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.USER);
+    const userStr = sessionStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.USER);
     if (userStr) {
       try {
         const user = JSON.parse(userStr);
         this.currentUserSubject.next(user);
-        console.log('✅ Usuario cargado desde storage:', user);
+        console.log('✅ Usuario cargado desde sessionStorage:', user);
       } catch (e) {
         console.error('❌ Error parseando usuario:', e);
         this.logout();
@@ -215,7 +216,7 @@ export class AuthService {
 
   getToken(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN);
+    return sessionStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.TOKEN);
   }
 
   isAuthenticated(): boolean {
@@ -228,7 +229,7 @@ export class AuthService {
 
   getUserType(): string | null {
     if (!this.isBrowser) return null;
-    return localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE);
+    return sessionStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.USER_TYPE);
   }
 
   hasRole(role: string): boolean {
