@@ -141,7 +141,7 @@
       <!-- Lista de Proyectos -->
       <div *ngIf="!loadingProyectos && proyectos.length > 0" class="proyectos-list">
         <div *ngFor="let proyecto of proyectos" class="proyecto-item">
-          <div class="proyecto-image" [style.background-image]="'url(' + proyecto.imagenPrincipal + ')'"></div>
+          <div class="proyecto-image" [style.background-image]="proyecto.imagenPrincipal ? 'url(' + getFullImageUrl(proyecto.imagenPrincipal) + ')' : ''"></div>
           <div class="proyecto-content">
             <div class="proyecto-header">
               <h3 class="proyecto-nombre">{{ proyecto.nombre }}</h3>
