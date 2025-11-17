@@ -15,9 +15,23 @@
         </p>
       </div>
   
+      <!-- Galería de Imágenes Sobre Nosotros -->
+      <div *ngIf="imagenesSobreNosotros && imagenesSobreNosotros.length > 0" class="mb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            *ngFor="let imagen of imagenesSobreNosotros"
+            class="rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+            <img
+              [src]="imagen"
+              alt="Sobre Nosotros"
+              class="w-full h-64 object-cover">
+          </div>
+        </div>
+      </div>
+
       <!-- Historia y Misión -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20">
-        
+
         <!-- Historia -->
         <div class="bg-white rounded-xl shadow-lg p-8">
           <div class="flex items-center mb-6">
@@ -35,7 +49,7 @@
             Cada proyecto que realizamos refleja nuestro compromiso con la calidad, innovación y satisfacción del cliente. Hemos construido no solo edificaciones, sino relaciones duraderas basadas en la confianza.
           </p>
         </div>
-  
+
         <!-- Misión y Visión -->
         <div class="bg-white rounded-xl shadow-lg p-8">
           <div class="flex items-center mb-6">
