@@ -16,58 +16,58 @@ export const API_ENDPOINTS = {
     
     // Solicitudes
     SOLICITUDES: {
-      BASE: '/solicitudes',
-      MIS_SOLICITUDES: '/solicitudes/mis-solicitudes',
-      BY_ID: (id: number) => `/solicitudes/${id}`,
-      ADMIN_TODAS: '/solicitudes/admin/todas',
-      CAMBIAR_ESTADO: (id: number) => `/solicitudes/${id}/estado`,
-      APROBAR: (id: number) => `/solicitudes/${id}/aprobar`,
-      RECHAZAR: (id: number) => `/solicitudes/${id}/rechazar`,
-      PENDIENTES_COUNT: '/solicitudes/admin/pendientes/count'
+      BASE: '/api/solicitudes',
+      MIS_SOLICITUDES: '/api/solicitudes/mis-solicitudes',
+      BY_ID: (id: number) => `/api/solicitudes/${id}`,
+      ADMIN_TODAS: '/api/solicitudes/admin/todas',
+      CAMBIAR_ESTADO: (id: number) => `/api/solicitudes/${id}/estado`,
+      APROBAR: (id: number) => `/api/solicitudes/${id}/aprobar`,
+      RECHAZAR: (id: number) => `/api/solicitudes/${id}/rechazar`,
+      PENDIENTES_COUNT: '/api/solicitudes/admin/pendientes/count'
     },
     
     // Proformas
     PROFORMAS: {
-      BASE: '/proformas',
-      BY_ID: (id: number) => `/proformas/${id}`,
-      BY_CODIGO: (codigo: string) => `/proformas/codigo/${codigo}`,
-      MIS_PROFORMAS: '/proformas/mis-proformas',
-      ADMIN_TODAS: '/proformas/admin/todas',
-      ENVIAR: (id: number) => `/proformas/${id}/enviar`,
-      CAMBIAR_ESTADO: (id: number) => `/proformas/${id}/estado`,
-      MARCAR_VISTA: (id: number) => `/proformas/${id}/marcar-vista`,
-      ESTADISTICAS: '/proformas/admin/estadisticas'
+      BASE: '/api/proformas',
+      BY_ID: (id: number) => `/api/proformas/${id}`,
+      BY_CODIGO: (codigo: string) => `/api/proformas/codigo/${codigo}`,
+      MIS_PROFORMAS: '/api/proformas/mis-proformas',
+      ADMIN_TODAS: '/api/proformas/admin/todas',
+      ENVIAR: (id: number) => `/api/proformas/${id}/enviar`,
+      CAMBIAR_ESTADO: (id: number) => `/api/proformas/${id}/estado`,
+      MARCAR_VISTA: (id: number) => `/api/proformas/${id}/marcar-vista`,
+      ESTADISTICAS: '/api/proformas/admin/estadisticas'
     },
     
     // Comprobantes
     COMPROBANTES: {
-      BASE: '/comprobantes',
-      BY_ID: (id: number) => `/comprobantes/${id}`,
-      MIS_COMPROBANTES: '/comprobantes/mis-comprobantes',
-      BY_PROFORMA: (id: number) => `/comprobantes/proforma/${id}`,
-      ADMIN_TODOS: '/comprobantes/admin/todos',
-      VERIFICAR: (id: number) => `/comprobantes/${id}/verificar`,
-      RECHAZAR: (id: number) => `/comprobantes/${id}/rechazar`,
-      CAMBIAR_ESTADO: (id: number) => `/comprobantes/${id}/estado`,
-      PENDIENTES_COUNT: '/comprobantes/admin/pendientes/count'
+      BASE: '/api/comprobantes',
+      BY_ID: (id: number) => `/api/comprobantes/${id}`,
+      MIS_COMPROBANTES: '/api/comprobantes/mis-comprobantes',
+      BY_PROFORMA: (id: number) => `/api/comprobantes/proforma/${id}`,
+      ADMIN_TODOS: '/api/comprobantes/admin/todos',
+      VERIFICAR: (id: number) => `/api/comprobantes/${id}/verificar`,
+      RECHAZAR: (id: number) => `/api/comprobantes/${id}/rechazar`,
+      CAMBIAR_ESTADO: (id: number) => `/api/comprobantes/${id}/estado`,
+      PENDIENTES_COUNT: '/api/comprobantes/admin/pendientes/count'
     },
     
     // Contenido Web
     CONTENIDO: {
       // Imágenes - Admin
-      IMAGENES: '/contenido/imagenes',
-      IMAGEN_BY_ID: (id: number) => `/contenido/imagenes/${id}`,
-      
+      IMAGENES: '/api/contenido/imagenes',
+      IMAGEN_BY_ID: (id: number) => `/api/contenido/imagenes/${id}`,
+
       // Proyectos Exitosos
-      PROYECTOS: '/contenido/proyectos',
-      PROYECTOS_ACTIVOS: '/contenido/proyectos/activos',
-      PROYECTO_BY_ID: (id: number) => `/contenido/proyectos/${id}`
+      PROYECTOS: '/api/contenido/proyectos',
+      PROYECTOS_ACTIVOS: '/api/contenido/proyectos/activos',
+      PROYECTO_BY_ID: (id: number) => `/api/contenido/proyectos/${id}`
     },
     
     // Archivos
     FILES: {
-      DOWNLOAD: (folder: string, filename: string) => `/files/download/${folder}/${filename}`,
-      VIEW: (folder: string, filename: string) => `/files/view/${folder}/${filename}`,
-      PUBLIC_IMAGE: (filename: string) => `/files/public/imagenes/${filename}`
+      DOWNLOAD: (folder: string, filename: string) => `/api/files/download/${folder}/${filename}`,
+      VIEW: (folder: string, filename: string) => `/api/files/view/${folder}/${filename}`,
+      PUBLIC_IMAGE: (filename: string) => `/api/files/public/imagenes/${filename}`
     }
   };
