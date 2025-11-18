@@ -57,6 +57,10 @@ export class SolicitudDetailComponent implements OnInit {
     });
   }
 
+  volverALaLista(): void {
+  this.router.navigate(['/admin/solicitudes']);
+}
+
   aprobarSolicitud(): void {
     if (!this.solicitud) return;
 
