@@ -1,1 +1,202 @@
-<p>solicitud-detail works!</p>
+<!-- ============================================ -->
+<!-- SOLICITUD-DETAIL.COMPONENT.HTML (Admin) -->
+<!-- ============================================ -->
+
+<div class="p-6 max-w-5xl mx-auto">
+  <!-- Cabecera -->
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-4">
+      <button
+        (click)="router.navigate(['/admin/solicitudes'])"
+        class="px-4 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+      >
+        ← Volver
+      </button>
+      <h1 class="text-2xl font-bold text-gray-900">Detalle de Solicitud</h1>
+    </div>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="flex justify-center items-center py-12">
+    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div *ngIf="!loading && solicitud" class="space-y-6">
+    <!-- Card de información principal -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+      <!-- Cabecera de la card con estado -->
+      <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">{{ solicitud.titulo }}</h2>
+        <span
+          class="px-4 py-2 text-sm font-semibold rounded-full"
+          [ngClass]="getEstadoClass(solicitud.estado)"
+        >
+          {{ getEstadoLabel(solicitud.estado) }}
+        </span>
+      </div>
+
+      <!-- Cuerpo de la card -->
+      <div class="p-6 space-y-6">
+        <!-- Información del cliente -->
+        <div class="border-l-4 border-blue-500 pl-4">
+          <h3 class="text-sm font-semibold text-gray-600 mb-1">Cliente</h3>
+          <p class="text-lg text-gray-900">{{ solicitud.clienteNombre }}</p>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <h3 class="text-sm font-semibold text-gray-600 mb-2">Descripción</h3>
+          <p class="text-gray-800 whitespace-pre-wrap">{{ solicitud.descripcion }}</p>
+        </div>
+
+        <!-- Grid de información -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
+          <!-- Fecha de solicitud -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-600 mb-1">Fecha de Solicitud</h3>
+            <p class="text-gray-900">{{ solicitud.fechaSolicitud | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+
+          <!-- Fecha de revisión -->
+          <div *ngIf="solicitud.fechaRevision">
+            <h3 class="text-sm font-semibold text-gray-600 mb-1">Fecha de Revisión</h3>
+            <p class="text-gray-900">{{ solicitud.fechaRevision | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+
+          <!-- Revisado por -->
+          <div *ngIf="solicitud.revisadoPor">
+            <h3 class="text-sm font-semibold text-gray-600 mb-1">Revisado por</h3>
+            <p class="text-gray-900">{{ solicitud.revisadoPor }}</p>
+          </div>
+
+          <!-- Archivo adjunto -->
+          <div *ngIf="solicitud.archivoAdjunto">
+            <h3 class="text-sm font-semibold text-gray-600 mb-1">Archivo Adjunto</h3>
+            <button
+              (click)="descargarArchivo()"
+              class="inline-flex items-center px-3 py-2 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+            >
+              <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Descargar archivo
+            </button>
+          </div>
+        </div>
+
+        <!-- Motivo de rechazo (si fue rechazada) -->
+        <div *ngIf="solicitud.estado === 'RECHAZADA' && solicitud.motivoRechazo" class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 class="text-sm font-semibold text-red-800 mb-2">Motivo de Rechazo</h3>
+          <p class="text-red-700">{{ solicitud.motivoRechazo }}</p>
+        </div>
+      </div>
+
+      <!-- Footer con acciones -->
+      <div *ngIf="solicitud.estado === 'PENDIENTE' || solicitud.estado === 'APROBADA'" class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+        <div class="flex justify-end gap-3">
+          <!-- Botones si está pendiente -->
+          <ng-container *ngIf="solicitud.estado === 'PENDIENTE'">
+            <button
+              (click)="abrirModalRechazo()"
+              [disabled]="procesandoAccion"
+              class="px-6 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              Rechazar
+            </button>
+            <button
+              (click)="aprobarSolicitud()"
+              [disabled]="procesandoAccion"
+              class="px-6 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+            >
+              {{ procesandoAccion ? 'Procesando...' : 'Aprobar' }}
+            </button>
+          </ng-container>
+
+          <!-- Botón si está aprobada -->
+          <ng-container *ngIf="solicitud.estado === 'APROBADA'">
+            <a
+              [routerLink]="['/admin/crear-proforma', solicitud.id]"
+              class="px-6 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors inline-block"
+            >
+              Crear Proforma
+            </a>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div class="flex items-start">
+        <svg class="w-5 h-5 text-blue-600 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>
+        <div>
+          <h3 class="text-sm font-semibold text-blue-900 mb-1">Estados de la solicitud</h3>
+          <ul class="text-sm text-blue-800 space-y-1">
+            <li><strong>Pendiente:</strong> La solicitud está en espera de revisión</li>
+            <li><strong>En Revisión:</strong> La solicitud está siendo evaluada</li>
+            <li><strong>Aprobada:</strong> La solicitud fue aprobada, puede crear una proforma</li>
+            <li><strong>Rechazada:</strong> La solicitud fue rechazada</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensaje si no se encuentra la solicitud -->
+  <div *ngIf="!loading && !solicitud" class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+    <svg class="w-12 h-12 text-yellow-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+    </svg>
+    <p class="text-yellow-800 font-semibold">No se encontró la solicitud</p>
+  </div>
+</div>
+
+<!-- Modal de rechazo -->
+<div
+  *ngIf="mostrarModalRechazo"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  (click)="cerrarModalRechazo()"
+>
+  <div
+    class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Cabecera del modal -->
+    <div class="bg-red-600 px-6 py-4 rounded-t-lg">
+      <h3 class="text-lg font-semibold text-white">Rechazar Solicitud</h3>
+    </div>
+
+    <!-- Cuerpo del modal -->
+    <div class="p-6">
+      <p class="text-gray-700 mb-4">Por favor, proporcione un motivo para rechazar esta solicitud:</p>
+      <textarea
+        [(ngModel)]="motivoRechazo"
+        rows="4"
+        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
+        placeholder="Escriba el motivo del rechazo..."
+        [disabled]="procesandoAccion"
+      ></textarea>
+    </div>
+
+    <!-- Footer del modal -->
+    <div class="bg-gray-50 px-6 py-4 rounded-b-lg flex justify-end gap-3">
+      <button
+        (click)="cerrarModalRechazo()"
+        [disabled]="procesandoAccion"
+        class="px-4 py-2 text-sm bg-gray-300 text-gray-700 rounded hover:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+      >
+        Cancelar
+      </button>
+      <button
+        (click)="rechazarSolicitud()"
+        [disabled]="procesandoAccion || !motivoRechazo.trim()"
+        class="px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+      >
+        {{ procesandoAccion ? 'Procesando...' : 'Rechazar Solicitud' }}
+      </button>
+    </div>
+  </div>
+</div>
