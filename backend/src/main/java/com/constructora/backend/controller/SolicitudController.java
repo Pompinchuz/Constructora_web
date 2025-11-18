@@ -47,7 +47,7 @@ public class SolicitudController {
      * POST /api/solicitudes
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<SolicitudProformaResponseDTO>> crearSolicitud(
             @RequestParam("titulo") String titulo,
             @RequestParam("descripcion") String descripcion,
@@ -80,7 +80,7 @@ public class SolicitudController {
      * GET /api/solicitudes/mis-solicitudes
      */
     @GetMapping("/mis-solicitudes")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<List<SolicitudProformaResponseDTO>>> obtenerMisSolicitudes(
             Authentication authentication) {
         
@@ -106,7 +106,7 @@ public class SolicitudController {
      * GET /api/solicitudes/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<SolicitudProformaResponseDTO>> obtenerSolicitudPorId(
             @PathVariable Long id,
             Authentication authentication) {
@@ -151,7 +151,7 @@ public class SolicitudController {
      * GET /api/solicitudes/admin/todas
      */
     @GetMapping("/admin/todas")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<List<SolicitudProformaResponseDTO>>> listarTodasSolicitudes(
             @RequestParam(required = false) EstadoSolicitud estado) {
         
@@ -175,7 +175,7 @@ public class SolicitudController {
      * PATCH /api/solicitudes/{id}/estado
      */
     @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<SolicitudProformaResponseDTO>> cambiarEstado(
             @PathVariable Long id,
             @RequestParam EstadoSolicitud estado,
@@ -204,7 +204,7 @@ public class SolicitudController {
      * POST /api/solicitudes/{id}/aprobar
      */
     @PostMapping("/{id}/aprobar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<SolicitudProformaResponseDTO>> aprobarSolicitud(
             @PathVariable Long id,
             Authentication authentication) {
@@ -231,7 +231,7 @@ public class SolicitudController {
      * POST /api/solicitudes/{id}/rechazar
      */
     @PostMapping("/{id}/rechazar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<SolicitudProformaResponseDTO>> rechazarSolicitud(
             @PathVariable Long id,
             @RequestParam String motivo,
@@ -259,7 +259,7 @@ public class SolicitudController {
      * GET /api/solicitudes/admin/pendientes/count
      */
     @GetMapping("/admin/pendientes/count")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<Long>> contarSolicitudesPendientes() {
         
         long count = solicitudService.contarSolicitudesPendientes();

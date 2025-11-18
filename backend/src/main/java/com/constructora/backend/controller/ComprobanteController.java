@@ -38,7 +38,7 @@
 //      * POST /api/comprobantes
 //      */
 //     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//     @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+//     @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
 //     public ResponseEntity<ApiResponseDTO<ComprobanteResponseDTO>> subirComprobante(
 //             @RequestParam("proformaId") Long proformaId,
 //             @RequestParam("monto") BigDecimal monto,
@@ -75,7 +75,7 @@
 //      * GET /api/comprobantes/mis-comprobantes
 //      */
 //     @GetMapping("/mis-comprobantes")
-//     @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+//     @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
 //     public ResponseEntity<ApiResponseDTO<List<ComprobanteResponseDTO>>> obtenerMisComprobantes(
 //             Authentication authentication) {
         
@@ -101,7 +101,7 @@
 //      * GET /api/comprobantes/proforma/{proformaId}
 //      */
 //     @GetMapping("/proforma/{proformaId}")
-//     @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+//     @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
 //     public ResponseEntity<ApiResponseDTO<List<ComprobanteResponseDTO>>> obtenerComprobantesPorProforma(
 //             @PathVariable Long proformaId) {
         
@@ -125,7 +125,7 @@
 //      * GET /api/comprobantes/{id}
 //      */
 //     @GetMapping("/{id}")
-//     @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+//     @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
 //     public ResponseEntity<ApiResponseDTO<ComprobanteResponseDTO>> obtenerComprobantePorId(
 //             @PathVariable Long id) {
         
@@ -148,7 +148,7 @@
 //      * GET /api/comprobantes/admin/todos
 //      */
 //     @GetMapping("/admin/todos")
-//     @PreAuthorize("hasRole('ADMINISTRADOR')")
+//     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
 //     public ResponseEntity<ApiResponseDTO<List<ComprobanteResponseDTO>>> listarTodosComprobantes(
 //             @RequestParam(required = false) EstadoComprobante estado) {
         
@@ -172,7 +172,7 @@
 //      * POST /api/comprobantes/{id}/verificar
 //      */
 //     @PostMapping("/{id}/verificar")
-//     @PreAuthorize("hasRole('ADMINISTRADOR')")
+//     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
 //     public ResponseEntity<ApiResponseDTO<ComprobanteResponseDTO>> verificarComprobante(
 //             @PathVariable Long id,
 //             @RequestParam(required = false) String observaciones,
@@ -200,7 +200,7 @@
 //      * POST /api/comprobantes/{id}/rechazar
 //      */
 //     @PostMapping("/{id}/rechazar")
-//     @PreAuthorize("hasRole('ADMINISTRADOR')")
+//     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
 //     public ResponseEntity<ApiResponseDTO<ComprobanteResponseDTO>> rechazarComprobante(
 //             @PathVariable Long id,
 //             @RequestParam String observaciones,
@@ -228,7 +228,7 @@
 //      * PATCH /api/comprobantes/{id}/estado
 //      */
 //     @PatchMapping("/{id}/estado")
-//     @PreAuthorize("hasRole('ADMINISTRADOR')")
+//     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
 //     public ResponseEntity<ApiResponseDTO<ComprobanteResponseDTO>> actualizarEstado(
 //             @PathVariable Long id,
 //             @RequestParam EstadoComprobante estado,
@@ -257,7 +257,7 @@
 //      * GET /api/comprobantes/admin/pendientes/count
 //      */
 //     @GetMapping("/admin/pendientes/count")
-//     @PreAuthorize("hasRole('ADMINISTRADOR')")
+//     @PreAuthorize("hasAuthority('ADMINISTRADOR')")
 //     public ResponseEntity<ApiResponseDTO<Long>> contarComprobantesPendientes() {
         
 //         long count = comprobanteService.contarComprobantesPendientes();

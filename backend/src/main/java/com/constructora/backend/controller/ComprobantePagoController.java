@@ -42,7 +42,7 @@ public class ComprobantePagoController {
      * POST /api/comprobantes
      */
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<ComprobantePagoResponseDTO>> subirComprobante(
             @RequestParam("proformaId") Long proformaId,
             @RequestParam("monto") BigDecimal monto,
@@ -82,7 +82,7 @@ public class ComprobantePagoController {
      * GET /api/comprobantes/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ComprobantePagoResponseDTO>> obtenerComprobantePorId(
             @PathVariable Long id) {
 
@@ -105,7 +105,7 @@ public class ComprobantePagoController {
      * GET /api/comprobantes/proforma/{proformaId}
      */
     @GetMapping("/proforma/{proformaId}")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<List<ComprobantePagoResponseDTO>>> obtenerComprobantesPorProforma(
             @PathVariable Long proformaId) {
 
@@ -128,7 +128,7 @@ public class ComprobantePagoController {
      * GET /api/comprobantes/mis-comprobantes
      */
     @GetMapping("/mis-comprobantes")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<List<ComprobantePagoResponseDTO>>> obtenerMisComprobantes(
             Authentication authentication) {
 
@@ -153,7 +153,7 @@ public class ComprobantePagoController {
      * GET /api/comprobantes/admin/pendientes
      */
     @GetMapping("/admin/pendientes")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<List<ComprobantePagoResponseDTO>>> obtenerComprobantesPendientes() {
 
         log.info("Admin obteniendo comprobantes pendientes");
@@ -175,7 +175,7 @@ public class ComprobantePagoController {
      * GET /api/comprobantes/admin/por-estado
      */
     @GetMapping("/admin/por-estado")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<List<ComprobantePagoResponseDTO>>> obtenerComprobantesPorEstado(
             @RequestParam EstadoComprobante estado) {
 
@@ -198,7 +198,7 @@ public class ComprobantePagoController {
      * POST /api/comprobantes/{id}/verificar
      */
     @PostMapping("/{id}/verificar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ComprobantePagoResponseDTO>> verificarComprobante(
             @PathVariable Long id,
             Authentication authentication) {
@@ -224,7 +224,7 @@ public class ComprobantePagoController {
      * POST /api/comprobantes/{id}/rechazar
      */
     @PostMapping("/{id}/rechazar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ComprobantePagoResponseDTO>> rechazarComprobante(
             @PathVariable Long id,
             @RequestParam String motivo,
@@ -251,7 +251,7 @@ public class ComprobantePagoController {
      * GET /api/comprobantes/admin/pendientes/count
      */
     @GetMapping("/admin/pendientes/count")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<Long>> contarComprobantesPendientes() {
 
         long count = comprobanteService.contarPorEstado(EstadoComprobante.PENDIENTE);

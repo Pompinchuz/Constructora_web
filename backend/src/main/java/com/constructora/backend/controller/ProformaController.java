@@ -46,7 +46,7 @@ public class ProformaController {
      * POST /api/proformas
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> crearProforma(
             @Valid @RequestBody CrearProformaDTO request,
             Authentication authentication) {
@@ -72,7 +72,7 @@ public class ProformaController {
      * POST /api/proformas/{id}/enviar
      */
     @PostMapping("/{id}/enviar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<Void>> enviarProforma(@PathVariable Long id) {
         
         log.info("Enviando proforma ID: {}", id);
@@ -93,7 +93,7 @@ public class ProformaController {
      * GET /api/proformas/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> obtenerProformaPorId(
             @PathVariable Long id) {
         
@@ -116,7 +116,7 @@ public class ProformaController {
      * GET /api/proformas/codigo/{codigo}
      */
     @GetMapping("/codigo/{codigo}")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> obtenerProformaPorCodigo(
             @PathVariable String codigo) {
         
@@ -139,7 +139,7 @@ public class ProformaController {
      * GET /api/proformas/mis-proformas
      */
     @GetMapping("/mis-proformas")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<List<ProformaResponseDTO>>> obtenerMisProformas(
             Authentication authentication) {
         
@@ -165,7 +165,7 @@ public class ProformaController {
      * GET /api/proformas/admin/todas
      */
     @GetMapping("/admin/todas")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<List<ProformaResponseDTO>>> listarTodasProformas(
             @RequestParam(required = false) EstadoProforma estado) {
         
@@ -188,7 +188,7 @@ public class ProformaController {
      * PATCH /api/proformas/{id}/estado
      */
     @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> actualizarEstado(
             @PathVariable Long id,
             @RequestParam EstadoProforma estado) {
@@ -212,7 +212,7 @@ public class ProformaController {
      * POST /api/proformas/{id}/marcar-vista
      */
     @PostMapping("/{id}/marcar-vista")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<Void>> marcarComoVista(@PathVariable Long id) {
         
         log.info("Marcando proforma {} como vista", id);
@@ -233,7 +233,7 @@ public class ProformaController {
      * DELETE /api/proformas/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<Void>> eliminarProforma(@PathVariable Long id) {
         
         log.info("Eliminando proforma ID: {}", id);
@@ -254,7 +254,7 @@ public class ProformaController {
      * GET /api/proformas/admin/estadisticas
      */
     @GetMapping("/admin/estadisticas")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaEstadisticasDTO>> obtenerEstadisticas() {
         
         log.info("Obteniendo estadísticas de proformas");
