@@ -1,5 +1,6 @@
 // ============================================
 // SOLICITUD-DETAIL.COMPONENT.TS (Admin)
+// Métodos agregados: onEstadoChange() y confirmarCambioEstado()
 // ============================================
 
 import { Component, OnInit } from '@angular/core';
@@ -27,6 +28,7 @@ export class SolicitudDetailComponent implements OnInit {
   procesandoAccion = false;
   apiUrl = environment.apiUrl;
   estadoSeleccionado: EstadoSolicitud | null = null;
+  estadoAnterior: EstadoSolicitud | null = null; // ✅ Para guardar el estado anterior
 
   // Opciones de estado disponibles
   estadosDisponibles = [
@@ -56,6 +58,7 @@ export class SolicitudDetailComponent implements OnInit {
         if (response.success && response.data) {
           this.solicitud = response.data;
           this.estadoSeleccionado = response.data.estado;
+          this.estadoAnterior = response.data.estado; // ✅ Guardar estado actual
         }
         this.loading = false;
       },
@@ -69,9 +72,75 @@ export class SolicitudDetailComponent implements OnInit {
   }
 
   volverALaLista(): void {
-  this.router.navigate(['/admin/solicitudes']);
-}
+    this.router.navigate(['/admin/solicitudes']);
+  }
 
+  // ============================================
+  // ✅ NUEVO MÉTODO: onEstadoChange()
+  // ============================================
+  /**
+   * Se ejecuta cuando el usuario cambia el estado en el select
+   * Detecta si se seleccionó RECHAZADA para mostrar modal de motivo
+   * Para otros estados, muestra modal de confirmación
+   */
+  onEstadoChange(): void {
+    if (!this.solicitud || !this.estadoSeleccionado) return;
+
+    // Si el estado no ha cambiado, no hacer nada
+    if (this.estadoSeleccionado === this.estadoAnterior) {
+      return;
+    }
+
+    // Si se selecciona RECHAZADA, mostrar modal de rechazo
+    if (this.estadoSeleccionado === EstadoSolicitud.RECHAZADA) {
+      this.abrirModalRechazo();
+    } else {
+      // Para otros estados, mostrar modal de confirmación
+      this.mostrarModalCambioEstado = true;
+    }
+  }
+
+  // ============================================
+  // ✅ NUEVO MÉTODO: confirmarCambioEstado()
+  // ============================================
+  /**
+   * Confirma el cambio de estado y llama al servicio
+   * Se ejecuta cuando el usuario hace clic en "Confirmar" en el modal
+   */
+  // ============================================
+// MÉTODO CORREGIDO: confirmarCambioEstado()
+// ============================================
+confirmarCambioEstado(): void {
+  if (!this.solicitud || !this.estadoSeleccionado) return;
+
+  this.procesandoAccion = true;
+  
+  // ✅ CORRECCIÓN: Agregar 'undefined' como tercer parámetro
+  this.solicitudService.cambiarEstado(
+    this.solicitud.id, 
+    this.estadoSeleccionado, 
+    undefined  // ← motivoRechazo es undefined para estados que no sean RECHAZADA
+  ).subscribe({
+    next: (response) => {
+      if (response.success && response.data) {
+        this.solicitud = response.data;
+        this.estadoSeleccionado = response.data.estado;
+        this.mostrarModalCambioEstado = false;
+        alert(`Estado cambiado a ${this.getEstadoLabel(response.data.estado)} exitosamente`);
+      }
+      this.procesandoAccion = false;
+    },
+    error: (error) => {
+      console.error('Error al cambiar estado:', error);
+      alert('Error al cambiar el estado de la solicitud');
+      this.procesandoAccion = false;
+      // Revertir al estado original en caso de error
+      if (this.solicitud) {
+        this.estadoSeleccionado = this.solicitud.estado;
+      }
+    }
+  });
+}
   aprobarSolicitud(): void {
     if (!this.solicitud) return;
 
@@ -81,6 +150,8 @@ export class SolicitudDetailComponent implements OnInit {
         next: (response) => {
           if (response.success && response.data) {
             this.solicitud = response.data;
+            this.estadoSeleccionado = response.data.estado;
+            this.estadoAnterior = response.data.estado; // ✅ Actualizar
             alert('Solicitud aprobada exitosamente');
           }
           this.procesandoAccion = false;
@@ -90,15 +161,16 @@ export class SolicitudDetailComponent implements OnInit {
           alert('Error al aprobar la solicitud');
           this.procesandoAccion = false;
         }
-      }
-    });
+      });
+    }
   }
 
+  // ============================================
+  // ✅ MODIFICADO: cancelarCambioEstado()
+  // ============================================
   cancelarCambioEstado(): void {
-    // Revertir la selección al estado actual
-    if (this.solicitud) {
-      this.estadoSeleccionado = this.solicitud.estado;
-    }
+    // Revertir la selección al estado anterior (no al estado actual de la solicitud)
+    this.estadoSeleccionado = this.estadoAnterior;
     this.mostrarModalCambioEstado = false;
   }
 
@@ -107,13 +179,14 @@ export class SolicitudDetailComponent implements OnInit {
     this.motivoRechazo = '';
   }
 
+  // ============================================
+  // ✅ MODIFICADO: cerrarModalRechazo()
+  // ============================================
   cerrarModalRechazo(): void {
     this.mostrarModalRechazo = false;
     this.motivoRechazo = '';
-    // Revertir el estado seleccionado si se cancela el rechazo
-    if (this.solicitud) {
-      this.estadoSeleccionado = this.solicitud.estado;
-    }
+    // Revertir al estado anterior
+    this.estadoSeleccionado = this.estadoAnterior;
   }
 
   rechazarSolicitud(): void {
@@ -132,6 +205,7 @@ export class SolicitudDetailComponent implements OnInit {
         if (response.success && response.data) {
           this.solicitud = response.data;
           this.estadoSeleccionado = response.data.estado;
+          this.estadoAnterior = response.data.estado; // ✅ Actualizar
           this.cerrarModalRechazo();
           alert('Solicitud rechazada exitosamente');
         }
@@ -141,10 +215,8 @@ export class SolicitudDetailComponent implements OnInit {
         console.error('Error al rechazar:', error);
         alert('Error al rechazar la solicitud');
         this.procesandoAccion = false;
-        // Revertir el estado seleccionado
-        if (this.solicitud) {
-          this.estadoSeleccionado = this.solicitud.estado;
-        }
+        // Revertir al estado anterior
+        this.estadoSeleccionado = this.estadoAnterior;
       }
     });
   }
