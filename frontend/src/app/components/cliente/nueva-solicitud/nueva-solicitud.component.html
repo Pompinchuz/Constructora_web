@@ -1,1 +1,167 @@
-<p>nueva-solicitud works!</p>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Header -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Nueva Solicitud de Proforma</h1>
+          <p class="text-gray-600">Completa el formulario para solicitar un presupuesto detallado</p>
+        </div>
+        <div class="hidden md:block">
+          <svg class="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario -->
+    <form [formGroup]="solicitudForm" (ngSubmit)="onSubmit()" class="bg-white rounded-xl shadow-md p-8">
+
+      <!-- Título -->
+      <div class="mb-6">
+        <label for="titulo" class="block text-sm font-bold text-gray-700 mb-2">
+          Título del Proyecto *
+        </label>
+        <input
+          type="text"
+          id="titulo"
+          formControlName="titulo"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+          placeholder="Ej: Construcción de vivienda de 2 pisos"
+        />
+        <div *ngIf="titulo?.invalid && (titulo?.dirty || titulo?.touched)" class="mt-2">
+          <p *ngIf="titulo?.errors?.['required']" class="text-red-600 text-sm">
+            ⚠️ El título es obligatorio
+          </p>
+        </div>
+      </div>
+
+      <!-- Descripción -->
+      <div class="mb-6">
+        <label for="descripcion" class="block text-sm font-bold text-gray-700 mb-2">
+          Descripción Detallada del Proyecto *
+        </label>
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          rows="8"
+          class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
+          placeholder="Describe detalladamente tu proyecto: tipo de construcción, ubicación, características especiales, materiales deseados, plazo estimado, etc."
+        ></textarea>
+        <div *ngIf="descripcion?.invalid && (descripcion?.dirty || descripcion?.touched)" class="mt-2">
+          <p *ngIf="descripcion?.errors?.['required']" class="text-red-600 text-sm">
+            ⚠️ La descripción es obligatoria
+          </p>
+        </div>
+        <p class="mt-2 text-sm text-gray-500">
+          Proporciona la mayor cantidad de detalles posible para obtener un presupuesto más preciso
+        </p>
+      </div>
+
+      <!-- Archivo Adjunto -->
+      <div class="mb-8">
+        <label class="block text-sm font-bold text-gray-700 mb-2">
+          Archivo Adjunto (Opcional)
+        </label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-xl hover:border-blue-500 transition-all">
+          <div class="space-y-1 text-center">
+            <svg *ngIf="!archivoSeleccionado" class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+
+            <!-- Archivo seleccionado -->
+            <div *ngIf="archivoSeleccionado" class="text-center">
+              <svg class="mx-auto h-12 w-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <p class="text-sm font-medium text-green-700 mt-2">{{ archivoSeleccionado.name }}</p>
+              <p class="text-xs text-gray-500">{{ (archivoSeleccionado.size / 1024 / 1024).toFixed(2) }} MB</p>
+            </div>
+
+            <div class="flex text-sm text-gray-600">
+              <label for="file-upload"
+                     class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                <span>{{ archivoSeleccionado ? 'Cambiar archivo' : 'Selecciona un archivo' }}</span>
+                <input
+                  id="file-upload"
+                  name="file-upload"
+                  type="file"
+                  class="sr-only"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  (change)="onFileSelected($event)"
+                />
+              </label>
+              <p class="pl-1">o arrastra y suelta</p>
+            </div>
+            <p class="text-xs text-gray-500">
+              PDF, JPG, PNG hasta 10MB
+            </p>
+          </div>
+        </div>
+        <p class="mt-2 text-sm text-gray-500">
+          Puedes adjuntar planos, fotografías del terreno, referencias o cualquier documento relevante
+        </p>
+      </div>
+
+      <!-- Información importante -->
+      <div class="mb-8 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+        <div class="flex items-start">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div class="ml-3">
+            <p class="text-sm text-blue-700 font-medium">
+              Información importante:
+            </p>
+            <ul class="mt-2 text-sm text-blue-700 list-disc list-inside space-y-1">
+              <li>Tu solicitud será revisada en un plazo máximo de 48 horas</li>
+              <li>Recibirás una notificación por correo cuando haya una respuesta</li>
+              <li>Podrás ver el estado de tu solicitud en "Mis Solicitudes"</li>
+              <li>Una vez aprobada, recibirás una proforma detallada</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex flex-col md:flex-row gap-4">
+        <button
+          type="button"
+          (click)="cancelar()"
+          class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          [disabled]="loading || solicitudForm.invalid"
+          [class.opacity-50]="loading || solicitudForm.invalid"
+          [class.cursor-not-allowed]="loading || solicitudForm.invalid"
+          class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2">
+          <svg *ngIf="!loading" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+          </svg>
+          <svg *ngIf="loading" class="animate-spin h-6 w-6 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span *ngIf="!loading">Enviar Solicitud</span>
+          <span *ngIf="loading">Enviando...</span>
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
