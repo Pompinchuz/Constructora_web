@@ -276,14 +276,18 @@ public class ProformaController {
     // ============================================
 
     /**
-     * 🔒 SEGURIDAD: Obtiene el ID del cliente autenticado
+     * 🔒 SEGURIDAD: Obtiene el ID del cliente autenticado desde el Authentication
+     * @param authentication Objeto de autenticación de Spring Security
+     * @return ID del cliente
      */
     private Long obtenerClienteId(Authentication authentication) {
-        String email = authentication.getName();
+        String email = authentication.getName(); // El correo está en el "name" del Authentication
 
+        // Buscar usuario por correo
         Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
 
+        // Buscar cliente por usuarioId
         Cliente cliente = clienteRepository.findByUsuarioId(usuario.getId())
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado para usuario: " + email));
 
@@ -293,14 +297,18 @@ public class ProformaController {
     }
 
     /**
-     * 🔒 SEGURIDAD: Obtiene el ID del administrador autenticado
+     * 🔒 SEGURIDAD: Obtiene el ID del administrador autenticado desde el Authentication
+     * @param authentication Objeto de autenticación de Spring Security
+     * @return ID del administrador
      */
     private Long obtenerAdminId(Authentication authentication) {
-        String email = authentication.getName();
+        String email = authentication.getName(); // El correo está en el "name" del Authentication
 
+        // Buscar usuario por correo
         Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
 
+        // Buscar administrador por usuarioId
         Administrador administrador = administradorRepository.findByUsuarioId(usuario.getId())
                 .orElseThrow(() -> new RuntimeException("Administrador no encontrado para usuario: " + email));
 
