@@ -179,22 +179,78 @@ public class EmailService {
             context.setVariable("numeroOperacion", comprobante.getNumeroOperacion());
             context.setVariable("banco", comprobante.getEntidadBancaria());
             context.setVariable("appUrl", appUrl);
-            
+
             String htmlContent = templateEngine.process("email/nuevo-comprobante", context);
-            
+
             enviarEmailHtml(
                 adminEmail,
                 "Nuevo Comprobante de Pago - " + appName,
                 htmlContent
             );
-            
+
             log.info("Notificación de nuevo comprobante enviada a administradores");
-            
+
         } catch (Exception e) {
             log.error("Error al notificar nuevo comprobante: {}", e.getMessage());
         }
     }
-    
+
+    /**
+     * Notifica al cliente que su comprobante fue verificado
+     */
+    @Async
+    public void notificarComprobanteVerificadoEmail(ComprobantePago comprobante) {
+        try {
+            Context context = new Context();
+            context.setVariable("cliente", comprobante.getCliente().getNombreCompleto());
+            context.setVariable("codigoProforma", comprobante.getProforma().getCodigo());
+            context.setVariable("monto", formatearMoneda(comprobante.getMonto()));
+            context.setVariable("appUrl", appUrl);
+
+            String htmlContent = templateEngine.process("email/comprobante-verificado", context);
+
+            enviarEmailHtml(
+                comprobante.getCliente().getUsuario().getCorreoElectronico(),
+                "Pago Verificado - " + appName,
+                htmlContent
+            );
+
+            log.info("Notificación de comprobante verificado enviada al cliente: {}",
+                    comprobante.getCliente().getNombreCompleto());
+
+        } catch (Exception e) {
+            log.error("Error al notificar comprobante verificado: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Notifica al cliente que su comprobante fue rechazado
+     */
+    @Async
+    public void notificarComprobanteRechazado(ComprobantePago comprobante) {
+        try {
+            Context context = new Context();
+            context.setVariable("cliente", comprobante.getCliente().getNombreCompleto());
+            context.setVariable("codigoProforma", comprobante.getProforma().getCodigo());
+            context.setVariable("motivo", comprobante.getObservaciones());
+            context.setVariable("appUrl", appUrl);
+
+            String htmlContent = templateEngine.process("email/comprobante-rechazado", context);
+
+            enviarEmailHtml(
+                comprobante.getCliente().getUsuario().getCorreoElectronico(),
+                "Comprobante Rechazado - " + appName,
+                htmlContent
+            );
+
+            log.info("Notificación de comprobante rechazado enviada al cliente: {}",
+                    comprobante.getCliente().getNombreCompleto());
+
+        } catch (Exception e) {
+            log.error("Error al notificar comprobante rechazado: {}", e.getMessage());
+        }
+    }
+
     // ============================================
     // MÉTODOS AUXILIARES
     // ============================================
