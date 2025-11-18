@@ -9,7 +9,13 @@ import com.constructora.backend.controller.dto.ApiResponseDTO;
 import com.constructora.backend.controller.dto.CrearProformaDTO;
 import com.constructora.backend.controller.dto.ProformaEstadisticasDTO;
 import com.constructora.backend.controller.dto.ProformaResponseDTO;
+import com.constructora.backend.entity.Administrador;
+import com.constructora.backend.entity.Cliente;
+import com.constructora.backend.entity.Usuario;
 import com.constructora.backend.entity.enums.EstadoProforma;
+import com.constructora.backend.repository.AdministradorRepository;
+import com.constructora.backend.repository.ClienteRepository;
+import com.constructora.backend.repository.UsuarioRepository;
 import com.constructora.backend.service.ProformaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +35,11 @@ import java.util.List;
 @Slf4j
 @CrossOrigin(origins = "${cors.allowed-origins}")
 public class ProformaController {
-    
+
     private final ProformaService proformaService;
+    private final UsuarioRepository usuarioRepository;
+    private final ClienteRepository clienteRepository;
+    private final AdministradorRepository administradorRepository;
     
     /**
      * Crear nueva proforma (ADMIN)
@@ -265,12 +274,38 @@ public class ProformaController {
     // ============================================
     // MÉTODOS AUXILIARES
     // ============================================
-    
+
+    /**
+     * 🔒 SEGURIDAD: Obtiene el ID del cliente autenticado
+     */
     private Long obtenerClienteId(Authentication authentication) {
-        return 1L; // Placeholder - implementar correctamente
+        String email = authentication.getName();
+
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
+
+        Cliente cliente = clienteRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado para usuario: " + email));
+
+        log.debug("Cliente ID {} obtenido para usuario {}", cliente.getId(), email);
+
+        return cliente.getId();
     }
-    
+
+    /**
+     * 🔒 SEGURIDAD: Obtiene el ID del administrador autenticado
+     */
     private Long obtenerAdminId(Authentication authentication) {
-        return 1L; // Placeholder - implementar correctamente
+        String email = authentication.getName();
+
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
+
+        Administrador administrador = administradorRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado para usuario: " + email));
+
+        log.debug("Administrador ID {} obtenido para usuario {}", administrador.getId(), email);
+
+        return administrador.getId();
     }
 }
