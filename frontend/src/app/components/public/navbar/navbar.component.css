@@ -348,3 +348,71 @@
   .navbar-spacer {
     height: 5rem;
   }
+
+  /* ============================================ */
+  /* Dark Mode Styles */
+  /* ============================================ */
+
+  [data-theme="dark"] .navbar.scrolled {
+    background-color: #1e293b;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-logo-text {
+    color: #f1f5f9;
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-link {
+    color: #cbd5e1;
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-link:hover {
+    color: #60a5fa;
+  }
+
+  [data-theme="dark"] .navbar.scrolled .btn-login {
+    color: #60a5fa;
+    border-color: #60a5fa;
+    background-color: rgba(96, 165, 250, 0.1);
+  }
+
+  [data-theme="dark"] .navbar.scrolled .btn-login:hover {
+    background-color: rgba(96, 165, 250, 0.2);
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-username {
+    color: #cbd5e1;
+  }
+
+  [data-theme="dark"] .navbar.scrolled .btn-logout {
+    color: #f87171;
+    background-color: rgba(248, 113, 113, 0.1);
+  }
+
+  [data-theme="dark"] .navbar.scrolled .btn-logout:hover {
+    background-color: rgba(248, 113, 113, 0.2);
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-mobile-btn {
+    color: #cbd5e1;
+    background-color: rgba(148, 163, 184, 0.1);
+    border-color: rgba(148, 163, 184, 0.2);
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-mobile-btn:hover {
+    background-color: rgba(148, 163, 184, 0.2);
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-mobile-link {
+    color: #cbd5e1;
+  }
+
+  [data-theme="dark"] .navbar.scrolled .navbar-mobile-link:hover {
+    background-color: rgba(96, 165, 250, 0.1);
+    color: #60a5fa;
+  }
+
+  [data-theme="dark"] .navbar-mobile-menu-items {
+    border-top-color: rgba(148, 163, 184, 0.2);
+  }
