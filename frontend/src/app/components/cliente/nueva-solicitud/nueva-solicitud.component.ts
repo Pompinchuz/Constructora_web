@@ -14,70 +14,7 @@ import { NotificationService } from '../../../services/notification.service';
   selector: 'app-nueva-solicitud',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  template: `
-    <div class="p-6 max-w-3xl mx-auto">
-      <h1 class="text-2xl font-bold text-gray-900 mb-6">Nueva Solicitud de Proforma</h1>
-      
-      <form [formGroup]="solicitudForm" (ngSubmit)="onSubmit()" class="bg-white rounded-lg shadow-md p-6">
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Título *</label>
-          <input
-            type="text"
-            formControlName="titulo"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ej: Construcción de vivienda de 2 pisos"
-          />
-          <div *ngIf="titulo?.invalid && titulo?.touched" class="mt-1 text-sm text-red-600">
-            El título es obligatorio
-          </div>
-        </div>
-
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Descripción del Proyecto *</label>
-          <textarea
-            formControlName="descripcion"
-            rows="6"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Describe detalladamente tu proyecto..."
-          ></textarea>
-          <div *ngIf="descripcion?.invalid && descripcion?.touched" class="mt-1 text-sm text-red-600">
-            La descripción es obligatoria
-          </div>
-        </div>
-
-        <div class="mb-6">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Archivo Adjunto (Opcional)</label>
-          <input
-            type="file"
-            (change)="onFileSelected($event)"
-            accept=".pdf,.jpg,.jpeg,.png"
-            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p class="mt-1 text-sm text-gray-500">Formatos: PDF, JPG, PNG (Máx. 10MB)</p>
-          <div *ngIf="archivoSeleccionado" class="mt-2 text-sm text-green-600">
-            ✓ {{ archivoSeleccionado.name }}
-          </div>
-        </div>
-
-        <div class="flex justify-end space-x-4">
-          <button
-            type="button"
-            (click)="cancelar()"
-            class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            [disabled]="loading || solicitudForm.invalid"
-            class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-          >
-            {{ loading ? 'Enviando...' : 'Enviar Solicitud' }}
-          </button>
-        </div>
-      </form>
-    </div>
-  `
+  templateUrl: './nueva-solicitud.component.html'
 })
 export class NuevaSolicitudComponent {
   solicitudForm: FormGroup;
