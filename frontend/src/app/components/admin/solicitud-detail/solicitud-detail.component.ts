@@ -68,43 +68,27 @@ export class SolicitudDetailComponent implements OnInit {
     });
   }
 
-  onEstadoChange(): void {
-    if (!this.solicitud || !this.estadoSeleccionado) return;
+  volverALaLista(): void {
+  this.router.navigate(['/admin/solicitudes']);
+}
 
-    // Si el estado seleccionado es el mismo que el actual, no hacer nada
-    if (this.estadoSeleccionado === this.solicitud.estado) {
-      return;
-    }
+  aprobarSolicitud(): void {
+    if (!this.solicitud) return;
 
-    // Si se selecciona RECHAZADA, mostrar modal para pedir motivo
-    if (this.estadoSeleccionado === EstadoSolicitud.RECHAZADA) {
-      this.abrirModalRechazo();
-    } else {
-      this.mostrarModalCambioEstado = true;
-    }
-  }
-
-  confirmarCambioEstado(): void {
-    if (!this.solicitud || !this.estadoSeleccionado) return;
-
-    this.procesandoAccion = true;
-    this.solicitudService.cambiarEstado(this.solicitud.id, this.estadoSeleccionado).subscribe({
-      next: (response) => {
-        if (response.success && response.data) {
-          this.solicitud = response.data;
-          this.estadoSeleccionado = response.data.estado;
-          this.mostrarModalCambioEstado = false;
-          alert(`Estado cambiado a ${this.getEstadoLabel(response.data.estado)} exitosamente`);
-        }
-        this.procesandoAccion = false;
-      },
-      error: (error) => {
-        console.error('Error al cambiar estado:', error);
-        alert('Error al cambiar el estado de la solicitud');
-        this.procesandoAccion = false;
-        // Revertir el estado seleccionado al estado actual de la solicitud
-        if (this.solicitud) {
-          this.estadoSeleccionado = this.solicitud.estado;
+    if (confirm('¿Está seguro de aprobar esta solicitud?')) {
+      this.procesandoAccion = true;
+      this.solicitudService.aprobarSolicitud(this.solicitud.id).subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.solicitud = response.data;
+            alert('Solicitud aprobada exitosamente');
+          }
+          this.procesandoAccion = false;
+        },
+        error: (error) => {
+          console.error('Error al aprobar:', error);
+          alert('Error al aprobar la solicitud');
+          this.procesandoAccion = false;
         }
       }
     });
