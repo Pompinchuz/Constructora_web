@@ -1,1 +1,221 @@
-<p>mis-proformas works!</p>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h1 class="text-4xl font-bold text-gray-900 mb-2">Mis Proformas</h1>
+          <p class="text-gray-600">Gestiona y revisa tus cotizaciones recibidas</p>
+        </div>
+        <button
+          [routerLink]="['/cliente/dashboard']"
+          class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg">
+          Volver al Dashboard
+        </button>
+      </div>
+
+      <!-- Estadísticas rápidas -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
+        <div class="bg-white rounded-xl shadow-md p-4 border-l-4 border-gray-500">
+          <p class="text-gray-500 text-sm font-medium">Total</p>
+          <p class="text-3xl font-bold text-gray-700">{{ proformas.length }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-4 border-l-4 border-blue-500">
+          <p class="text-gray-500 text-sm font-medium">Enviadas</p>
+          <p class="text-3xl font-bold text-blue-600">{{ contarPorEstado(EstadoProforma.ENVIADA) }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-4 border-l-4 border-cyan-500">
+          <p class="text-gray-500 text-sm font-medium">Vistas</p>
+          <p class="text-3xl font-bold text-cyan-600">{{ contarPorEstado(EstadoProforma.VISTA) }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-4 border-l-4 border-green-500">
+          <p class="text-gray-500 text-sm font-medium">Aceptadas</p>
+          <p class="text-3xl font-bold text-green-600">{{ contarPorEstado(EstadoProforma.ACEPTADA) }}</p>
+        </div>
+        <div class="bg-white rounded-xl shadow-md p-4 border-l-4 border-purple-500">
+          <p class="text-gray-500 text-sm font-medium">Pagadas</p>
+          <p class="text-3xl font-bold text-purple-600">{{ contarPorEstado(EstadoProforma.PAGADA) }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <p class="text-sm font-medium text-gray-700 mb-3">Filtrar por estado:</p>
+      <div class="flex flex-wrap gap-3">
+        <button
+          (click)="cambiarFiltro('TODOS')"
+          [class.bg-gray-700]="filtroEstado === 'TODOS'"
+          [class.bg-gray-200]="filtroEstado !== 'TODOS'"
+          [class.text-white]="filtroEstado === 'TODOS'"
+          [class.text-gray-700]="filtroEstado !== 'TODOS'"
+          class="px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-md">
+          Todas ({{ proformas.length }})
+        </button>
+        <button
+          (click)="cambiarFiltro(EstadoProforma.ENVIADA)"
+          [class.bg-blue-600]="filtroEstado === EstadoProforma.ENVIADA"
+          [class.bg-blue-100]="filtroEstado !== EstadoProforma.ENVIADA"
+          [class.text-white]="filtroEstado === EstadoProforma.ENVIADA"
+          [class.text-blue-700]="filtroEstado !== EstadoProforma.ENVIADA"
+          class="px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-md">
+          Enviadas ({{ contarPorEstado(EstadoProforma.ENVIADA) }})
+        </button>
+        <button
+          (click)="cambiarFiltro(EstadoProforma.VISTA)"
+          [class.bg-cyan-600]="filtroEstado === EstadoProforma.VISTA"
+          [class.bg-cyan-100]="filtroEstado !== EstadoProforma.VISTA"
+          [class.text-white]="filtroEstado === EstadoProforma.VISTA"
+          [class.text-cyan-700]="filtroEstado !== EstadoProforma.VISTA"
+          class="px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-md">
+          Vistas ({{ contarPorEstado(EstadoProforma.VISTA) }})
+        </button>
+        <button
+          (click)="cambiarFiltro(EstadoProforma.ACEPTADA)"
+          [class.bg-green-600]="filtroEstado === EstadoProforma.ACEPTADA"
+          [class.bg-green-100]="filtroEstado !== EstadoProforma.ACEPTADA"
+          [class.text-white]="filtroEstado === EstadoProforma.ACEPTADA"
+          [class.text-green-700]="filtroEstado !== EstadoProforma.ACEPTADA"
+          class="px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-md">
+          Aceptadas ({{ contarPorEstado(EstadoProforma.ACEPTADA) }})
+        </button>
+        <button
+          (click)="cambiarFiltro(EstadoProforma.RECHAZADA)"
+          [class.bg-red-600]="filtroEstado === EstadoProforma.RECHAZADA"
+          [class.bg-red-100]="filtroEstado !== EstadoProforma.RECHAZADA"
+          [class.text-white]="filtroEstado === EstadoProforma.RECHAZADA"
+          [class.text-red-700]="filtroEstado !== EstadoProforma.RECHAZADA"
+          class="px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-md">
+          Rechazadas ({{ contarPorEstado(EstadoProforma.RECHAZADA) }})
+        </button>
+        <button
+          (click)="cambiarFiltro(EstadoProforma.PAGADA)"
+          [class.bg-purple-600]="filtroEstado === EstadoProforma.PAGADA"
+          [class.bg-purple-100]="filtroEstado !== EstadoProforma.PAGADA"
+          [class.text-white]="filtroEstado === EstadoProforma.PAGADA"
+          [class.text-purple-700]="filtroEstado !== EstadoProforma.PAGADA"
+          class="px-5 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-md">
+          Pagadas ({{ contarPorEstado(EstadoProforma.PAGADA) }})
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="flex flex-col items-center space-y-4">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+        <p class="text-gray-600 font-medium">Cargando proformas...</p>
+      </div>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!loading && proformasFiltradas.length === 0" class="bg-white rounded-xl shadow-lg p-12 text-center">
+      <div class="text-gray-400 mb-6">
+        <svg class="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+          </path>
+        </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-700 mb-2">No hay proformas</h3>
+      <p class="text-gray-500 mb-6">
+        <span *ngIf="filtroEstado === 'TODOS'">Aún no tienes proformas recibidas.</span>
+        <span *ngIf="filtroEstado !== 'TODOS'">No hay proformas con el estado seleccionado.</span>
+      </p>
+      <button
+        *ngIf="filtroEstado !== 'TODOS'"
+        (click)="cambiarFiltro('TODOS')"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg">
+        Ver Todas las Proformas
+      </button>
+    </div>
+
+    <!-- Lista de proformas -->
+    <div *ngIf="!loading && proformasFiltradas.length > 0" class="space-y-4">
+      <div *ngFor="let proforma of proformasFiltradas"
+           class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200">
+        <div class="p-6">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+            <!-- Información principal -->
+            <div class="flex-1">
+              <div class="flex items-start justify-between mb-3">
+                <div>
+                  <div class="flex items-center gap-3 mb-2">
+                    <h3 class="text-xl font-bold text-gray-900">{{ proforma.codigo }}</h3>
+                    <span [class]="getColorBadge(proforma.estado) + ' text-white text-sm px-3 py-1 rounded-full font-medium'">
+                      {{ estadosLabels[proforma.estado] }}
+                    </span>
+                  </div>
+                  <p class="text-gray-600 text-sm">Creado por: <span class="font-medium">{{ proforma.creadoPor }}</span></p>
+                </div>
+              </div>
+
+              <!-- Grid de información -->
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <p class="text-gray-500 text-xs font-medium mb-1">Fecha de Creación</p>
+                  <p class="text-gray-900 font-semibold">{{ formatearFecha(proforma.fechaCreacion) }}</p>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs font-medium mb-1">Vigencia</p>
+                  <div class="flex items-center gap-2">
+                    <p class="text-gray-900 font-semibold">{{ formatearFecha(proforma.vigenciaHasta) }}</p>
+                    <span *ngIf="esVigente(proforma.vigenciaHasta)"
+                          class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full font-medium">
+                      Vigente
+                    </span>
+                    <span *ngIf="!esVigente(proforma.vigenciaHasta)"
+                          class="bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-medium">
+                      Vencida
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <p class="text-gray-500 text-xs font-medium mb-1">Monto Total</p>
+                  <p class="text-2xl font-bold text-blue-600">{{ formatearMoneda(proforma.total) }}</p>
+                  <p class="text-xs text-gray-500">IGV incluido</p>
+                </div>
+              </div>
+
+              <!-- Observaciones -->
+              <div *ngIf="proforma.observaciones" class="mt-4 bg-gray-50 rounded-lg p-3">
+                <p class="text-gray-500 text-xs font-medium mb-1">Observaciones</p>
+                <p class="text-gray-700 text-sm">{{ proforma.observaciones }}</p>
+              </div>
+            </div>
+
+            <!-- Acciones -->
+            <div class="flex flex-col gap-3 lg:ml-6">
+              <button
+                [routerLink]="['/cliente/proforma', proforma.id]"
+                class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                Ver Detalle
+              </button>
+
+              <!-- Botón de pago si está aceptada -->
+              <button
+                *ngIf="proforma.estado === EstadoProforma.ACEPTADA"
+                [routerLink]="['/cliente/subir-comprobante', proforma.id]"
+                class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Subir Comprobante
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
