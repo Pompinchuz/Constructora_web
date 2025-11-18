@@ -70,7 +70,7 @@
       <!-- Lista de Imágenes -->
       <div *ngIf="!loadingImagenes && imagenes.length > 0" class="imagenes-grid">
         <div *ngFor="let imagen of imagenes" class="imagen-card">
-          <div class="imagen-preview" [style.background-image]="'url(' + imagen.urlImagen + ')'">
+          <div class="imagen-preview" [style.background-image]="'url(' + getFullImageUrl(imagen.urlImagen) + ')'">
             <div class="imagen-overlay">
               <button class="btn-icon-white" (click)="verImagen(imagen)" title="Ver">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -141,7 +141,7 @@
       <!-- Lista de Proyectos -->
       <div *ngIf="!loadingProyectos && proyectos.length > 0" class="proyectos-list">
         <div *ngFor="let proyecto of proyectos" class="proyecto-item">
-          <div class="proyecto-image" [style.background-image]="'url(' + proyecto.imagenPrincipal + ')'"></div>
+          <div class="proyecto-image" [style.background-image]="proyecto.imagenPrincipal ? 'url(' + getFullImageUrl(proyecto.imagenPrincipal) + ')' : ''"></div>
           <div class="proyecto-content">
             <div class="proyecto-header">
               <h3 class="proyecto-nombre">{{ proyecto.nombre }}</h3>

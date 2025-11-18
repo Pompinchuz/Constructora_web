@@ -1,9 +1,12 @@
 // ============================================
-// SOBRE-NOSOTROS.COMPONENT.TS
+// SOBRE-NOSOTROS.COMPONENT.TS - Con imágenes dinámicas
 // ============================================
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ContenidoService } from '../../../services/contenido.service';
+import { environment } from '../../../../environments/environment';
+import { TipoImagen } from '../../models/contenido.models';
 
 interface Valor {
   icono: string;
@@ -18,7 +21,9 @@ interface Valor {
   templateUrl: './sobre-nosotros.component.html',
   styleUrl: './sobre-nosotros.component.css'
 })
-export class SobreNosotrosComponent {
+export class SobreNosotrosComponent implements OnInit {
+  readonly apiUrl = environment.apiUrl;
+  imagenesSobreNosotros: string[] = [];
   
   valores: Valor[] = [
     {
@@ -49,4 +54,30 @@ export class SobreNosotrosComponent {
     { numero: '98%', label: 'Clientes Satisfechos' },
     { numero: '24/7', label: 'Atención al Cliente' }
   ];
+
+  constructor(private contenidoService: ContenidoService) {}
+
+  ngOnInit(): void {
+    this.cargarImagenesSobreNosotros();
+  }
+
+  cargarImagenesSobreNosotros(): void {
+    this.contenidoService.obtenerImagenesActivasPorTipo(TipoImagen.SOBRE_NOSOTROS).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.imagenesSobreNosotros = response.data.map(img => this.getFullImageUrl(img.urlImagen));
+        }
+      },
+      error: (error) => {
+        console.error('Error cargando imágenes de sobre nosotros:', error);
+      }
+    });
+  }
+
+  getFullImageUrl(urlImagen: string): string {
+    if (urlImagen && urlImagen.startsWith('http')) {
+      return urlImagen;
+    }
+    return this.apiUrl + urlImagen;
+  }
 }

@@ -19,6 +19,7 @@ export class NavbarComponent implements OnInit {
   isScrolled = false;
   isAuthenticated = false;
   userName = '';
+  isAdmin = false;
   private isBrowser: boolean;
 
   constructor(
@@ -34,6 +35,7 @@ export class NavbarComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.isAuthenticated = !!user;
       this.userName = user?.nombre || '';
+      this.isAdmin = user?.tipo === 'ADMINISTRADOR';
     });
 
     // Detectar scroll solo en el navegador
@@ -66,5 +68,10 @@ export class NavbarComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);
+  }
+
+  irAAdmin(): void {
+    this.closeMobileMenu();
+    this.router.navigate(['/admin']);
   }
 }

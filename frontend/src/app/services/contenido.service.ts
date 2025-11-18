@@ -27,11 +27,11 @@ export class ContenidoService {
   }
 
   obtenerImagenesPorTipo(tipo: TipoImagen): Observable<ApiResponse<Imagen[]>> {
-    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/tipo/${tipo}`);
+    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/admin?tipo=${tipo}`);
   }
 
   obtenerImagenesActivasPorTipo(tipo: TipoImagen): Observable<ApiResponse<Imagen[]>> {
-    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/tipo/${tipo}/activas`);
+    return this.http.get<ApiResponse<Imagen[]>>(`${this.apiUrl}/imagenes/publico/${tipo}`);
   }
 
   obtenerTodasImagenes(): Observable<ApiResponse<Imagen[]>> {
