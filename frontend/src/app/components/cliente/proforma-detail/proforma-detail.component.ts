@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ProformaService } from '../../../services/proforma.service';
 import { Proforma, EstadoProforma, GastoProforma } from '../../models/proforma.models';
 import {
@@ -11,7 +11,7 @@ import {
 @Component({
   selector: 'app-proforma-detail',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './proforma-detail.component.html',
   styleUrl: './proforma-detail.component.css'
 })
