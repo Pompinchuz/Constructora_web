@@ -7,7 +7,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { SolicitudService } from '../../../services/solicitud.service';
-import { SolicitudProforma } from '../../models/solicitud.models';
+import { SolicitudProforma, EstadoSolicitud } from '../../models/solicitud.models';
 import { ESTADOS_SOLICITUD_LABELS } from '../../constants/estados.constants';
 import { environment } from '../../../../environments/environment';
 
@@ -22,9 +22,19 @@ export class SolicitudDetailComponent implements OnInit {
   solicitud: SolicitudProforma | null = null;
   loading = true;
   mostrarModalRechazo = false;
+  mostrarModalCambioEstado = false;
   motivoRechazo = '';
   procesandoAccion = false;
   apiUrl = environment.apiUrl;
+  estadoSeleccionado: EstadoSolicitud | null = null;
+
+  // Opciones de estado disponibles
+  estadosDisponibles = [
+    { value: EstadoSolicitud.PENDIENTE, label: 'Pendiente' },
+    { value: EstadoSolicitud.EN_REVISION, label: 'En Revisión' },
+    { value: EstadoSolicitud.APROBADA, label: 'Aprobada' },
+    { value: EstadoSolicitud.RECHAZADA, label: 'Rechazada' }
+  ];
 
   constructor(
     private route: ActivatedRoute,
@@ -45,6 +55,7 @@ export class SolicitudDetailComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data) {
           this.solicitud = response.data;
+          this.estadoSeleccionado = response.data.estado;
         }
         this.loading = false;
       },
@@ -79,8 +90,16 @@ export class SolicitudDetailComponent implements OnInit {
           alert('Error al aprobar la solicitud');
           this.procesandoAccion = false;
         }
-      });
+      }
+    });
+  }
+
+  cancelarCambioEstado(): void {
+    // Revertir la selección al estado actual
+    if (this.solicitud) {
+      this.estadoSeleccionado = this.solicitud.estado;
     }
+    this.mostrarModalCambioEstado = false;
   }
 
   abrirModalRechazo(): void {
@@ -91,6 +110,10 @@ export class SolicitudDetailComponent implements OnInit {
   cerrarModalRechazo(): void {
     this.mostrarModalRechazo = false;
     this.motivoRechazo = '';
+    // Revertir el estado seleccionado si se cancela el rechazo
+    if (this.solicitud) {
+      this.estadoSeleccionado = this.solicitud.estado;
+    }
   }
 
   rechazarSolicitud(): void {
@@ -100,10 +123,15 @@ export class SolicitudDetailComponent implements OnInit {
     }
 
     this.procesandoAccion = true;
-    this.solicitudService.rechazarSolicitud(this.solicitud.id, this.motivoRechazo).subscribe({
+    this.solicitudService.cambiarEstado(
+      this.solicitud.id,
+      EstadoSolicitud.RECHAZADA,
+      this.motivoRechazo
+    ).subscribe({
       next: (response) => {
         if (response.success && response.data) {
           this.solicitud = response.data;
+          this.estadoSeleccionado = response.data.estado;
           this.cerrarModalRechazo();
           alert('Solicitud rechazada exitosamente');
         }
@@ -113,6 +141,10 @@ export class SolicitudDetailComponent implements OnInit {
         console.error('Error al rechazar:', error);
         alert('Error al rechazar la solicitud');
         this.procesandoAccion = false;
+        // Revertir el estado seleccionado
+        if (this.solicitud) {
+          this.estadoSeleccionado = this.solicitud.estado;
+        }
       }
     });
   }
