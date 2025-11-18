@@ -23,6 +23,9 @@
           <a (click)="scrollToSection('sobre-nosotros')" class="navbar-link">Nosotros</a>
           <a (click)="scrollToSection('contacto')" class="navbar-link">Contacto</a>
   
+          <!-- Theme Toggle (Desktop) -->
+          <app-theme-toggle></app-theme-toggle>
+
           <!-- Auth Buttons (Desktop) -->
           <div class="navbar-auth" *ngIf="!isAuthenticated">
             <a routerLink="/login" class="btn-login">Iniciar Sesión</a>
@@ -62,7 +65,12 @@
           <a (click)="scrollToSection('proyectos')" class="navbar-mobile-link">Proyectos</a>
           <a (click)="scrollToSection('sobre-nosotros')" class="navbar-mobile-link">Nosotros</a>
           <a (click)="scrollToSection('contacto')" class="navbar-mobile-link">Contacto</a>
-  
+
+          <!-- Theme Toggle (Mobile) -->
+          <div class="flex justify-center py-2">
+            <app-theme-toggle></app-theme-toggle>
+          </div>
+
           <div class="navbar-mobile-auth" *ngIf="!isAuthenticated">
             <a routerLink="/login" (click)="closeMobileMenu()" class="btn-login">Iniciar Sesión</a>
             <a routerLink="/registro-tipo" (click)="closeMobileMenu()" class="btn-register">Registrarse</a>
