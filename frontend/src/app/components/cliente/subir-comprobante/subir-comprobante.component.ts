@@ -54,6 +54,9 @@ export class SubirComprobanteComponent implements OnInit {
       observaciones: ['']
     });
   }
+volverMisProformas(): void {
+  this.router.navigate(['/cliente/mis-proformas']);
+}
 
   cargarProforma(): void {
     this.loadingProforma = true;

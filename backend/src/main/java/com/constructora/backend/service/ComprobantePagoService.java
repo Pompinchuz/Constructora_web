@@ -164,7 +164,7 @@ public class ComprobantePagoService {
                 comprobanteId, adminId, proforma.getCodigo());
 
         // Notificar al cliente
-        emailService.notificarComprobante VerificadoEmail(comprobante);
+        emailService.notificarComprobanteVerificadoEmail(comprobante);
 
         return mapearAResponse(comprobante);
     }
