@@ -13,7 +13,8 @@ import { ESTADOS_SOLICITUD_LABELS, ESTADOS_SOLICITUD_COLORS } from '../../consta
   selector: 'app-mis-solicitudes',
   standalone: true,
   imports: [CommonModule, RouterLink],
-  templateUrl: './mis-solicitudes.component.html'
+  templateUrl: './mis-solicitudes.component.html',
+  styleUrl: './mis-solicitudes.component.css'
 })
 export class MisSolicitudesComponent implements OnInit {
   solicitudes: any[] = [];

@@ -14,7 +14,8 @@ import { NotificationService } from '../../../services/notification.service';
   selector: 'app-nueva-solicitud',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './nueva-solicitud.component.html'
+  templateUrl: './nueva-solicitud.component.html',
+  styleUrl: './nueva-solicitud.component.css'
 })
 export class NuevaSolicitudComponent {
   solicitudForm: FormGroup;
