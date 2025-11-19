@@ -1,96 +1,189 @@
-<div class="p-6 max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">¡Bienvenido, {{ usuario?.nombre }}!</h1>
-      <p class="text-gray-600 mt-2">Resumen de tus solicitudes y proformas</p>
+<div class="p-6 max-w-7xl mx-auto min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <!-- Header con animación -->
+    <div class="mb-8 animate-slide-in-down">
+      <h1 class="text-4xl font-bold text-gray-900">¡Bienvenido, {{ usuario?.nombre }}!</h1>
+      <p class="text-gray-600 mt-2 text-lg">Resumen de tus solicitudes y proformas</p>
     </div>
-  
-    <!-- Estadísticas Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-      <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
-        <p class="text-gray-500 text-sm font-medium">Total Solicitudes</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.totalSolicitudes }}</p>
-      </div>
-  
-      <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
-        <p class="text-gray-500 text-sm font-medium">Solicitudes Pendientes</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.solicitudesPendientes }}</p>
-      </div>
-  
-      <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
-        <p class="text-gray-500 text-sm font-medium">Total Proformas</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.totalProformas }}</p>
-      </div>
-  
-      <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
-        <p class="text-gray-500 text-sm font-medium">Proformas Pendientes</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.proformasPendientes }}</p>
-      </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="flex justify-center items-center py-20">
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
     </div>
-  
-    <!-- Acciones Rápidas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-      <a routerLink="/cliente/nueva-solicitud" class="block bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-        <div class="flex items-center">
-          <svg class="w-12 h-12 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+    <div *ngIf="!loading">
+      <!-- Estadísticas Cards Mejoradas -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Solicitudes -->
+        <div class="card card-bordered hover-lift animate-slide-in-up">
+          <div class="card-body" style="border-left: 4px solid #3b82f6;">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-gray-500 text-sm font-medium">Total Solicitudes</p>
+              <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ estadisticas.totalSolicitudes }}</p>
+          </div>
+        </div>
+
+        <!-- Solicitudes Pendientes -->
+        <div class="card card-bordered hover-lift animate-slide-in-up animate-delay-100">
+          <div class="card-body" style="border-left: 4px solid #eab308;">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-gray-500 text-sm font-medium">Solicitudes Pendientes</p>
+              <svg class="w-8 h-8 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ estadisticas.solicitudesPendientes }}</p>
+            <span class="badge badge-warning-soft badge-sm mt-2" *ngIf="estadisticas.solicitudesPendientes > 0">
+              Requiere atención
+            </span>
+          </div>
+        </div>
+
+        <!-- Total Proformas -->
+        <div class="card card-bordered hover-lift animate-slide-in-up animate-delay-200">
+          <div class="card-body" style="border-left: 4px solid #10b981;">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-gray-500 text-sm font-medium">Total Proformas</p>
+              <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ estadisticas.totalProformas }}</p>
+          </div>
+        </div>
+
+        <!-- Proformas Pendientes -->
+        <div class="card card-bordered hover-lift animate-slide-in-up animate-delay-300">
+          <div class="card-body" style="border-left: 4px solid #8b5cf6;">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-gray-500 text-sm font-medium">Proformas Pendientes</p>
+              <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <p class="text-4xl font-bold text-gray-900">{{ estadisticas.proformasPendientes }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones Rápidas Mejoradas -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Acciones Rápidas</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Nueva Solicitud - Destacada -->
+          <a routerLink="/cliente/nueva-solicitud" class="card card-primary hover-lift">
+            <div class="card-body">
+              <div class="flex items-center">
+                <svg class="w-12 h-12 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <div>
+                  <h3 class="card-title text-lg">Nueva Solicitud</h3>
+                  <p class="text-sm text-white/90">Solicita una proforma</p>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <!-- Mis Solicitudes -->
+          <a routerLink="/cliente/mis-solicitudes" class="card card-interactive card-elevated hover-lift">
+            <div class="card-body">
+              <div class="flex items-center">
+                <div class="bg-blue-100 rounded-full p-3 mr-4">
+                  <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="card-title text-lg">Mis Solicitudes</h3>
+                  <p class="text-sm text-gray-600">Ver todas</p>
+                  <span class="badge badge-primary-soft badge-sm mt-1" *ngIf="estadisticas.totalSolicitudes > 0">
+                    {{ estadisticas.totalSolicitudes }} total
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+
+          <!-- Mis Proformas -->
+          <a routerLink="/cliente/mis-proformas" class="card card-interactive card-elevated hover-lift">
+            <div class="card-body">
+              <div class="flex items-center">
+                <div class="bg-green-100 rounded-full p-3 mr-4">
+                  <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="card-title text-lg">Mis Proformas</h3>
+                  <p class="text-sm text-gray-600">Ver todas</p>
+                  <span class="badge badge-success-soft badge-sm mt-1" *ngIf="estadisticas.totalProformas > 0">
+                    {{ estadisticas.totalProformas }} total
+                  </span>
+                </div>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Últimas Solicitudes Mejoradas -->
+      <div class="card card-elevated animate-slide-in-up" *ngIf="ultimasSolicitudes.length > 0">
+        <div class="card-header">
+          <h2 class="card-title">Últimas Solicitudes</h2>
+          <p class="card-subtitle">Tus solicitudes más recientes</p>
+        </div>
+        <div class="card-body">
+          <div class="space-y-4">
+            <div *ngFor="let solicitud of ultimasSolicitudes"
+                 class="flex items-start justify-between p-4 border-l-4 border-blue-500 bg-gray-50 rounded-r-lg hover-lift">
+              <div class="flex-1">
+                <h3 class="font-semibold text-gray-900">{{ solicitud.titulo }}</h3>
+                <p class="text-sm text-gray-600 mt-1">
+                  <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  {{ solicitud.fechaSolicitud | date:'dd/MM/yyyy' }}
+                </p>
+              </div>
+              <span class="badge badge-pill"
+                    [ngClass]="{
+                      'badge-warning': solicitud.estado === 'PENDIENTE',
+                      'badge-info': solicitud.estado === 'EN_REVISION',
+                      'badge-success': solicitud.estado === 'APROBADA',
+                      'badge-danger': solicitud.estado === 'RECHAZADA'
+                    }">
+                {{ solicitud.estado }}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <a routerLink="/cliente/mis-solicitudes" class="text-blue-600 text-sm font-medium hover:underline inline-flex items-center">
+            Ver todas las solicitudes
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Empty State si no hay solicitudes -->
+      <div class="card card-flat text-center py-12 animate-fade-in" *ngIf="!loading && ultimasSolicitudes.length === 0">
+        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">No tienes solicitudes aún</h3>
+        <p class="text-gray-600 mb-4">Comienza creando tu primera solicitud de proforma</p>
+        <a routerLink="/cliente/nueva-solicitud" class="btn btn-primary">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
           </svg>
-          <div>
-            <h3 class="font-bold text-lg">Nueva Solicitud</h3>
-            <p class="text-sm opacity-90">Solicita una proforma</p>
-          </div>
-        </div>
-      </a>
-  
-      <a routerLink="/cliente/mis-solicitudes" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-        <div class="flex items-center">
-          <div class="bg-blue-100 rounded-full p-3 mr-4">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-semibold text-gray-900">Mis Solicitudes</h3>
-            <p class="text-sm text-gray-600">Ver todas</p>
-          </div>
-        </div>
-      </a>
-  
-      <a routerLink="/cliente/mis-proformas" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
-        <div class="flex items-center">
-          <div class="bg-green-100 rounded-full p-3 mr-4">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-semibold text-gray-900">Mis Proformas</h3>
-            <p class="text-sm text-gray-600">Ver todas</p>
-          </div>
-        </div>
-      </a>
-    </div>
-  
-    <!-- Últimas Solicitudes -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8" *ngIf="ultimasSolicitudes.length > 0">
-      <h2 class="text-xl font-bold text-gray-900 mb-4">Últimas Solicitudes</h2>
-      <div class="space-y-4">
-        <div *ngFor="let solicitud of ultimasSolicitudes" class="border-l-4 border-blue-500 pl-4 py-2">
-          <h3 class="font-semibold text-gray-900">{{ solicitud.titulo }}</h3>
-          <p class="text-sm text-gray-600">{{ solicitud.fechaSolicitud | date:'dd/MM/yyyy' }}</p>
-          <span class="inline-block px-2 py-1 text-xs font-semibold rounded" 
-                [ngClass]="{
-                  'bg-yellow-100 text-yellow-800': solicitud.estado === 'PENDIENTE',
-                  'bg-blue-100 text-blue-800': solicitud.estado === 'EN_REVISION',
-                  'bg-green-100 text-green-800': solicitud.estado === 'APROBADA',
-                  'bg-red-100 text-red-800': solicitud.estado === 'RECHAZADA'
-                }">
-            {{ solicitud.estado }}
-          </span>
-        </div>
+          Nueva Solicitud
+        </a>
       </div>
-      <a routerLink="/cliente/mis-solicitudes" class="text-blue-600 text-sm font-medium mt-4 inline-block hover:underline">
-        Ver todas las solicitudes →
-      </a>
     </div>
   </div>
