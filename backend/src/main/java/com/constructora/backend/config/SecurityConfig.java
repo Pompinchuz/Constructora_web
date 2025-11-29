@@ -62,7 +62,21 @@ public class SecurityConfig {
                     "/error",
                     "/actuator/health"
                 ).permitAll()
-                
+
+                // ============================================
+                // RUTAS DE CLIENTE - DEBEN IR ANTES DE ADMIN
+                // ============================================
+                .requestMatchers(
+                    "/api/solicitudes/mis-solicitudes",
+                    "/api/proformas/mis-proformas",
+                    "/api/comprobantes/mis-comprobantes",
+                    "/api/cliente/**",
+                    // Rutas de aprobación de proyectos para clientes
+                    "/api/contenido/proyectos/cliente/**",
+                    "/api/contenido/proyectos/*/aprobar",
+                    "/api/contenido/proyectos/*/rechazar"
+                ).hasAnyAuthority("CLIENTE_NATURAL", "CLIENTE_JURIDICO")
+
                 // ============================================
                 // RUTAS DE ADMINISTRADOR
                 // ============================================
@@ -74,17 +88,7 @@ public class SecurityConfig {
                     "/api/contenido/proyectos",
                     "/api/contenido/proyectos/**"
                 ).hasAuthority("ADMINISTRADOR")
-                
-                // ============================================
-                // RUTAS DE CLIENTE
-                // ============================================
-                .requestMatchers(
-                    "/api/solicitudes/mis-solicitudes",
-                    "/api/proformas/mis-proformas",
-                    "/api/comprobantes/mis-comprobantes",
-                    "/api/cliente/**"
-                ).hasAnyAuthority("CLIENTE_NATURAL", "CLIENTE_JURIDICO")
-                
+
                 // ============================================
                 // RESTO DE RUTAS REQUIEREN AUTENTICACIÓN
                 // ============================================

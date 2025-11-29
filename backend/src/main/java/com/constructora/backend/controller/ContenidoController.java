@@ -9,7 +9,10 @@ import com.constructora.backend.controller.dto.AprobacionProyectoDTO;
 import com.constructora.backend.controller.dto.ImagenResponseDTO;
 import com.constructora.backend.controller.dto.ProyectoExitosoDTO;
 import com.constructora.backend.controller.dto.ProyectoExitosoResponseDTO;
+import com.constructora.backend.entity.Cliente;
 import com.constructora.backend.entity.enums.TipoImagen;
+import com.constructora.backend.exception.NotFoundException;
+import com.constructora.backend.repository.ClienteRepository;
 import com.constructora.backend.service.ContenidoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,8 +35,9 @@ import java.util.List;
 @Slf4j
 @CrossOrigin(origins = "${cors.allowed-origins}")
 public class ContenidoController {
-    
+
     private final ContenidoService contenidoService;
+    private final ClienteRepository clienteRepository;
     
     // ============================================
     // ENDPOINTS PÚBLICOS
@@ -412,8 +416,9 @@ public class ContenidoController {
     // ============================================
 
     private Long obtenerClienteId(Authentication authentication) {
-        // TODO: Implementar correctamente obteniendo el clienteId desde el JWT
-        // Por ahora retorna un placeholder
-        return 1L;
+        String email = authentication.getName(); // El username es el email
+        Cliente cliente = clienteRepository.findByCorreoElectronico(email)
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado para el usuario autenticado"));
+        return cliente.getId();
     }
 }
