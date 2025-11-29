@@ -49,6 +49,41 @@ export class ProyectoService {
   eliminarProyecto(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/proyectos/${id}`);
   }
+
+  // ============================================
+  // GESTIÓN DE APROBACIONES (CLIENTE)
+  // ============================================
+
+  /**
+   * Obtener proyectos pendientes de aprobación del cliente autenticado
+   */
+  obtenerProyectosPendientes(): Observable<ApiResponse<ProyectoExitoso[]>> {
+    return this.http.get<ApiResponse<ProyectoExitoso[]>>(`${this.apiUrl}/proyectos/cliente/pendientes`);
+  }
+
+  /**
+   * Obtener todos los proyectos del cliente autenticado
+   */
+  obtenerMisProyectos(): Observable<ApiResponse<ProyectoExitoso[]>> {
+    return this.http.get<ApiResponse<ProyectoExitoso[]>>(`${this.apiUrl}/proyectos/cliente/mis-proyectos`);
+  }
+
+  /**
+   * Aprobar la publicación de un proyecto
+   */
+  aprobarProyecto(proyectoId: number): Observable<ApiResponse<ProyectoExitoso>> {
+    return this.http.post<ApiResponse<ProyectoExitoso>>(`${this.apiUrl}/proyectos/${proyectoId}/aprobar`, {});
+  }
+
+  /**
+   * Rechazar la publicación de un proyecto
+   */
+  rechazarProyecto(proyectoId: number, motivoRechazo: string): Observable<ApiResponse<ProyectoExitoso>> {
+    return this.http.post<ApiResponse<ProyectoExitoso>>(
+      `${this.apiUrl}/proyectos/${proyectoId}/rechazar`,
+      { motivoRechazo }
+    );
+  }
 }
 
 

@@ -5,17 +5,20 @@
 package com.constructora.backend.controller;
 
 import com.constructora.backend.controller.dto.ApiResponseDTO;
+import com.constructora.backend.controller.dto.AprobacionProyectoDTO;
 import com.constructora.backend.controller.dto.ImagenResponseDTO;
 import com.constructora.backend.controller.dto.ProyectoExitosoDTO;
 import com.constructora.backend.controller.dto.ProyectoExitosoResponseDTO;
 import com.constructora.backend.entity.enums.TipoImagen;
 import com.constructora.backend.service.ContenidoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -194,26 +197,28 @@ public class ContenidoController {
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> crearProyecto(
             @RequestParam("nombre") String nombre,
+            @RequestParam("clienteId") Long clienteId,
             @RequestParam(value = "descripcion", required = false) String descripcion,
             @RequestParam(value = "ubicacion", required = false) String ubicacion,
             @RequestParam(value = "fechaInicio", required = false) String fechaInicio,
             @RequestParam(value = "fechaFinalizacion", required = false) String fechaFinalizacion,
             @RequestParam(value = "imagenPrincipal", required = false) MultipartFile imagenPrincipal,
             @RequestParam(value = "imagenesAdicionales", required = false) List<MultipartFile> imagenesAdicionales) {
-        
-        log.info("Admin creando proyecto: {}", nombre);
-        
+
+        log.info("Admin creando proyecto: {} para cliente: {}", nombre, clienteId);
+
         ProyectoExitosoDTO dto = new ProyectoExitosoDTO();
         dto.setNombre(nombre);
+        dto.setClienteId(clienteId);
         dto.setDescripcion(descripcion);
         dto.setUbicacion(ubicacion);
-        
+
         if (fechaInicio != null) dto.setFechaInicio(LocalDate.parse(fechaInicio));
         if (fechaFinalizacion != null) dto.setFechaFinalizacion(LocalDate.parse(fechaFinalizacion));
-        
+
         dto.setImagenPrincipal(imagenPrincipal);
         dto.setImagenesAdicionales(imagenesAdicionales);
-        
+
         ProyectoExitosoResponseDTO response = contenidoService.crearProyecto(dto);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -283,10 +288,10 @@ public class ContenidoController {
     @DeleteMapping("/proyectos/{id}")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
     public ResponseEntity<ApiResponseDTO<Void>> eliminarProyecto(@PathVariable Long id) {
-        
+
         log.info("Admin eliminando proyecto ID: {}", id);
         contenidoService.eliminarProyecto(id);
-        
+
         return ResponseEntity.ok(
             ApiResponseDTO.<Void>builder()
                 .success(true)
@@ -294,5 +299,121 @@ public class ContenidoController {
                 .timestamp(LocalDateTime.now())
                 .build()
         );
+    }
+
+    // ============================================
+    // GESTIÓN DE APROBACIONES DE PROYECTOS (CLIENTE)
+    // ============================================
+
+    /**
+     * Obtener proyectos pendientes de aprobación del cliente autenticado
+     * GET /api/contenido/proyectos/cliente/pendientes
+     */
+    @GetMapping("/proyectos/cliente/pendientes")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    public ResponseEntity<ApiResponseDTO<List<ProyectoExitosoResponseDTO>>> obtenerProyectosPendientes(
+            Authentication authentication) {
+
+        Long clienteId = obtenerClienteId(authentication);
+        log.info("Cliente {} obteniendo proyectos pendientes de aprobación", clienteId);
+
+        List<ProyectoExitosoResponseDTO> proyectos =
+                contenidoService.obtenerProyectosPendientesCliente(clienteId);
+
+        return ResponseEntity.ok(
+            ApiResponseDTO.<List<ProyectoExitosoResponseDTO>>builder()
+                .success(true)
+                .message("Proyectos pendientes obtenidos")
+                .data(proyectos)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+
+    /**
+     * Obtener todos los proyectos del cliente autenticado
+     * GET /api/contenido/proyectos/cliente/mis-proyectos
+     */
+    @GetMapping("/proyectos/cliente/mis-proyectos")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    public ResponseEntity<ApiResponseDTO<List<ProyectoExitosoResponseDTO>>> obtenerMisProyectos(
+            Authentication authentication) {
+
+        Long clienteId = obtenerClienteId(authentication);
+        log.info("Cliente {} obteniendo todos sus proyectos", clienteId);
+
+        List<ProyectoExitosoResponseDTO> proyectos =
+                contenidoService.obtenerProyectosCliente(clienteId);
+
+        return ResponseEntity.ok(
+            ApiResponseDTO.<List<ProyectoExitosoResponseDTO>>builder()
+                .success(true)
+                .message("Proyectos obtenidos")
+                .data(proyectos)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+
+    /**
+     * Aprobar la publicación de un proyecto
+     * POST /api/contenido/proyectos/{id}/aprobar
+     */
+    @PostMapping("/proyectos/{id}/aprobar")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> aprobarProyecto(
+            @PathVariable Long id,
+            Authentication authentication) {
+
+        Long clienteId = obtenerClienteId(authentication);
+        log.info("Cliente {} aprobando proyecto {}", clienteId, id);
+
+        ProyectoExitosoResponseDTO response = contenidoService.aprobarProyecto(id, clienteId);
+
+        return ResponseEntity.ok(
+            ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                .success(true)
+                .message("Proyecto aprobado exitosamente")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+
+    /**
+     * Rechazar la publicación de un proyecto
+     * POST /api/contenido/proyectos/{id}/rechazar
+     */
+    @PostMapping("/proyectos/{id}/rechazar")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> rechazarProyecto(
+            @PathVariable Long id,
+            @Valid @RequestBody AprobacionProyectoDTO request,
+            Authentication authentication) {
+
+        Long clienteId = obtenerClienteId(authentication);
+        log.info("Cliente {} rechazando proyecto {}", clienteId, id);
+
+        ProyectoExitosoResponseDTO response = contenidoService.rechazarProyecto(
+                id, clienteId, request.getMotivoRechazo());
+
+        return ResponseEntity.ok(
+            ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                .success(true)
+                .message("Proyecto rechazado")
+                .data(response)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+
+    // ============================================
+    // MÉTODOS AUXILIARES
+    // ============================================
+
+    private Long obtenerClienteId(Authentication authentication) {
+        // TODO: Implementar correctamente obteniendo el clienteId desde el JWT
+        // Por ahora retorna un placeholder
+        return 1L;
     }
 }
