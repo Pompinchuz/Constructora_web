@@ -324,6 +324,8 @@ public class ContenidoController {
         List<ProyectoExitosoResponseDTO> proyectos =
                 contenidoService.obtenerProyectosPendientesCliente(clienteId);
 
+        log.info("Se encontraron {} proyectos pendientes para el cliente {}", proyectos.size(), clienteId);
+
         return ResponseEntity.ok(
             ApiResponseDTO.<List<ProyectoExitosoResponseDTO>>builder()
                 .success(true)
@@ -417,8 +419,12 @@ public class ContenidoController {
 
     private Long obtenerClienteId(Authentication authentication) {
         String email = authentication.getName(); // El username es el email
+        log.info("Obteniendo clienteId para el email: {}", email);
+
         Cliente cliente = clienteRepository.findByCorreoElectronico(email)
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado para el usuario autenticado"));
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado para el usuario autenticado: " + email));
+
+        log.info("Cliente encontrado - ID: {}, Nombre: {}", cliente.getId(), cliente.getNombreCompleto());
         return cliente.getId();
     }
 }
