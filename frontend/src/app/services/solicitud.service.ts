@@ -67,6 +67,18 @@ export class SolicitudService {
     );
   }
 
+  cambiarEstado(id: number, estado: EstadoSolicitud, motivoRechazo?: string): Observable<ApiResponse<SolicitudProforma>> {
+    let params = new HttpParams().set('estado', estado);
+    if (motivoRechazo) {
+      params = params.set('motivoRechazo', motivoRechazo);
+    }
+    return this.http.patch<ApiResponse<SolicitudProforma>>(
+      `${environment.apiUrl}${API_ENDPOINTS.SOLICITUDES.CAMBIAR_ESTADO(id)}`,
+      {},
+      { params }
+    );
+  }
+
   contarSolicitudesPendientes(): Observable<ApiResponse<number>> {
     return this.http.get<ApiResponse<number>>(
       `${environment.apiUrl}${API_ENDPOINTS.SOLICITUDES.PENDIENTES_COUNT}`

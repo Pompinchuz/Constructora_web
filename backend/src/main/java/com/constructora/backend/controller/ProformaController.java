@@ -9,7 +9,13 @@ import com.constructora.backend.controller.dto.ApiResponseDTO;
 import com.constructora.backend.controller.dto.CrearProformaDTO;
 import com.constructora.backend.controller.dto.ProformaEstadisticasDTO;
 import com.constructora.backend.controller.dto.ProformaResponseDTO;
+import com.constructora.backend.entity.Administrador;
+import com.constructora.backend.entity.Cliente;
+import com.constructora.backend.entity.Usuario;
 import com.constructora.backend.entity.enums.EstadoProforma;
+import com.constructora.backend.repository.AdministradorRepository;
+import com.constructora.backend.repository.ClienteRepository;
+import com.constructora.backend.repository.UsuarioRepository;
 import com.constructora.backend.service.ProformaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,15 +35,18 @@ import java.util.List;
 @Slf4j
 @CrossOrigin(origins = "${cors.allowed-origins}")
 public class ProformaController {
-    
+
     private final ProformaService proformaService;
+    private final UsuarioRepository usuarioRepository;
+    private final ClienteRepository clienteRepository;
+    private final AdministradorRepository administradorRepository;
     
     /**
      * Crear nueva proforma (ADMIN)
      * POST /api/proformas
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> crearProforma(
             @Valid @RequestBody CrearProformaDTO request,
             Authentication authentication) {
@@ -63,7 +72,7 @@ public class ProformaController {
      * POST /api/proformas/{id}/enviar
      */
     @PostMapping("/{id}/enviar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<Void>> enviarProforma(@PathVariable Long id) {
         
         log.info("Enviando proforma ID: {}", id);
@@ -84,7 +93,7 @@ public class ProformaController {
      * GET /api/proformas/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> obtenerProformaPorId(
             @PathVariable Long id) {
         
@@ -107,7 +116,7 @@ public class ProformaController {
      * GET /api/proformas/codigo/{codigo}
      */
     @GetMapping("/codigo/{codigo}")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO', 'ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> obtenerProformaPorCodigo(
             @PathVariable String codigo) {
         
@@ -130,7 +139,7 @@ public class ProformaController {
      * GET /api/proformas/mis-proformas
      */
     @GetMapping("/mis-proformas")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<List<ProformaResponseDTO>>> obtenerMisProformas(
             Authentication authentication) {
         
@@ -156,7 +165,7 @@ public class ProformaController {
      * GET /api/proformas/admin/todas
      */
     @GetMapping("/admin/todas")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<List<ProformaResponseDTO>>> listarTodasProformas(
             @RequestParam(required = false) EstadoProforma estado) {
         
@@ -179,7 +188,7 @@ public class ProformaController {
      * PATCH /api/proformas/{id}/estado
      */
     @PatchMapping("/{id}/estado")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaResponseDTO>> actualizarEstado(
             @PathVariable Long id,
             @RequestParam EstadoProforma estado) {
@@ -203,7 +212,7 @@ public class ProformaController {
      * POST /api/proformas/{id}/marcar-vista
      */
     @PostMapping("/{id}/marcar-vista")
-    @PreAuthorize("hasAnyRole('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
+    @PreAuthorize("hasAnyAuthority('CLIENTE_NATURAL', 'CLIENTE_JURIDICO')")
     public ResponseEntity<ApiResponseDTO<Void>> marcarComoVista(@PathVariable Long id) {
         
         log.info("Marcando proforma {} como vista", id);
@@ -224,7 +233,7 @@ public class ProformaController {
      * DELETE /api/proformas/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<Void>> eliminarProforma(@PathVariable Long id) {
         
         log.info("Eliminando proforma ID: {}", id);
@@ -245,7 +254,7 @@ public class ProformaController {
      * GET /api/proformas/admin/estadisticas
      */
     @GetMapping("/admin/estadisticas")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR')")
     public ResponseEntity<ApiResponseDTO<ProformaEstadisticasDTO>> obtenerEstadisticas() {
         
         log.info("Obteniendo estadísticas de proformas");
@@ -265,12 +274,46 @@ public class ProformaController {
     // ============================================
     // MÉTODOS AUXILIARES
     // ============================================
-    
+
+    /**
+     * 🔒 SEGURIDAD: Obtiene el ID del cliente autenticado desde el Authentication
+     * @param authentication Objeto de autenticación de Spring Security
+     * @return ID del cliente
+     */
     private Long obtenerClienteId(Authentication authentication) {
-        return 1L; // Placeholder - implementar correctamente
+        String email = authentication.getName(); // El correo está en el "name" del Authentication
+
+        // Buscar usuario por correo
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
+
+        // Buscar cliente por usuarioId
+        Cliente cliente = clienteRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado para usuario: " + email));
+
+        log.debug("Cliente ID {} obtenido para usuario {}", cliente.getId(), email);
+
+        return cliente.getId();
     }
-    
+
+    /**
+     * 🔒 SEGURIDAD: Obtiene el ID del administrador autenticado desde el Authentication
+     * @param authentication Objeto de autenticación de Spring Security
+     * @return ID del administrador
+     */
     private Long obtenerAdminId(Authentication authentication) {
-        return 1L; // Placeholder - implementar correctamente
+        String email = authentication.getName(); // El correo está en el "name" del Authentication
+
+        // Buscar usuario por correo
+        Usuario usuario = usuarioRepository.findByCorreoElectronico(email)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado: " + email));
+
+        // Buscar administrador por usuarioId
+        Administrador administrador = administradorRepository.findByUsuarioId(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Administrador no encontrado para usuario: " + email));
+
+        log.debug("Administrador ID {} obtenido para usuario {}", administrador.getId(), email);
+
+        return administrador.getId();
     }
 }

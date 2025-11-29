@@ -78,7 +78,7 @@ export class LoginComponent implements OnInit {
     if (this.returnUrl && this.returnUrl !== '/') {
       this.router.navigateByUrl(this.returnUrl);
     } else if (this.authService.isAdmin()) {
-      this.router.navigate(['/admin/dashboard']);
+      this.router.navigate(['/']);
     } else {
       this.router.navigate(['/cliente/dashboard']);
     }

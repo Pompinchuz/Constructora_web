@@ -163,7 +163,22 @@ public class SolicitudProformaService {
     public long contarPorCliente(Long clienteId) {
         return solicitudRepository.countByClienteId(clienteId);
     }
-    
+
+    /**
+     * 🔒 SEGURIDAD: Verifica que una solicitud pertenece a un cliente específico
+     */
+    @Transactional(readOnly = true)
+    public boolean solicitudPerteneceACliente(Long solicitudId, Long clienteId) {
+        SolicitudProforma solicitud = solicitudRepository.findById(solicitudId)
+                .orElseThrow(() -> new NotFoundException("Solicitud no encontrada"));
+
+        boolean pertenece = solicitud.getCliente().getId().equals(clienteId);
+
+        log.debug("Solicitud {} pertenece a cliente {}: {}", solicitudId, clienteId, pertenece);
+
+        return pertenece;
+    }
+
     // ============================================
     // MÉTODO DE MAPEO
     // ============================================

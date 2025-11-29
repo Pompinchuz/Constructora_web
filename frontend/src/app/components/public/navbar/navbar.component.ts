@@ -6,11 +6,12 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { ThemeToggleComponent } from '../../shared/theme-toggle/theme-toggle.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ThemeToggleComponent],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
@@ -19,6 +20,7 @@ export class NavbarComponent implements OnInit {
   isScrolled = false;
   isAuthenticated = false;
   userName = '';
+  isAdmin = false;
   private isBrowser: boolean;
 
   constructor(
@@ -34,6 +36,7 @@ export class NavbarComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.isAuthenticated = !!user;
       this.userName = user?.nombre || '';
+      this.isAdmin = user?.tipo === 'ADMINISTRADOR';
     });
 
     // Detectar scroll solo en el navegador
@@ -66,5 +69,10 @@ export class NavbarComponent implements OnInit {
   logout(): void {
     this.authService.logout();
     this.router.navigate(['/']);
+  }
+
+  irAAdmin(): void {
+    this.closeMobileMenu();
+    this.router.navigate(['/admin']);
   }
 }

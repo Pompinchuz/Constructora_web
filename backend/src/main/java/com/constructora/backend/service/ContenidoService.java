@@ -439,12 +439,15 @@ public class ContenidoService {
     // ============================================
 
     private ImagenResponseDTO mapearImagenAResponse(Imagen imagen) {
+        // Construir URL completa para acceder a la imagen
+        String urlCompleta = "/uploads/" + imagen.getUrlImagen();
+
         return ImagenResponseDTO.builder()
                 .id(imagen.getId())
                 .tipo(imagen.getTipo())
                 .titulo(imagen.getTitulo())
                 .descripcion(imagen.getDescripcion())
-                .urlImagen(imagen.getUrlImagen())
+                .urlImagen(urlCompleta)
                 .orden(imagen.getOrden())
                 .activo(imagen.getActivo())
                 .fechaSubida(imagen.getFechaSubida())
@@ -453,6 +456,16 @@ public class ContenidoService {
     
     private ProyectoExitosoResponseDTO mapearProyectoAResponse(ProyectoExitoso proyecto,
                                                                 List<String> imagenes) {
+        // Construir URL completa para imagen principal
+        String imagenPrincipalUrl = proyecto.getImagenPrincipal() != null
+            ? "/uploads/" + proyecto.getImagenPrincipal()
+            : null;
+
+        // Construir URLs completas para imágenes adicionales
+        List<String> imagenesUrls = imagenes.stream()
+            .map(img -> "/uploads/" + img)
+            .collect(Collectors.toList());
+
         return ProyectoExitosoResponseDTO.builder()
                 .id(proyecto.getId())
                 .nombre(proyecto.getNombre())
@@ -460,8 +473,8 @@ public class ContenidoService {
                 .ubicacion(proyecto.getUbicacion())
                 .fechaInicio(proyecto.getFechaInicio())
                 .fechaFinalizacion(proyecto.getFechaFinalizacion())
-                .imagenPrincipal(proyecto.getImagenPrincipal())
-                .imagenes(imagenes)
+                .imagenPrincipal(imagenPrincipalUrl)
+                .imagenes(imagenesUrls)
                 .activo(proyecto.getActivo())
                 .clienteId(proyecto.getCliente() != null ? proyecto.getCliente().getId() : null)
                 .clienteNombre(proyecto.getCliente() != null ? proyecto.getCliente().getNombreCompleto() : null)

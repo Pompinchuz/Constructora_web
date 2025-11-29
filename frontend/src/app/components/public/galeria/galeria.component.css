@@ -1,0 +1,20 @@
+/* ============================================ */
+/* GALERIA.COMPONENT.CSS */
+/* ============================================ */
+
+.galeria-section {
+  background-color: #f9fafb;
+}
+
+.galeria-item {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.galeria-item:hover {
+  transform: translateY(-4px);
+}
+
+.container {
+  max-width: 1200px;
+}

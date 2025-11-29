@@ -22,11 +22,24 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService {
-    
+
     @Value("${file.upload-dir:uploads}")
     private String uploadDir;
-    
+
     private Path fileStorageLocation;
+
+    // 🔒 SEGURIDAD: Whitelist de extensiones de archivos permitidas
+    private static final java.util.Set<String> EXTENSIONES_PERMITIDAS = java.util.Set.of(
+        ".pdf",
+        ".jpg",
+        ".jpeg",
+        ".png",
+        ".gif",
+        ".doc",
+        ".docx",
+        ".xls",
+        ".xlsx"
+    );
     
     @PostConstruct
     public void init() {
@@ -134,19 +147,51 @@ public class FileStorageService {
         if (file == null || file.isEmpty()) {
             throw new FileStorageException("No se puede almacenar un archivo vacío");
         }
-        
+
         // Validar tamaño (10MB máximo)
         long maxSize = 10 * 1024 * 1024; // 10MB en bytes
         if (file.getSize() > maxSize) {
             throw new FileStorageException(
                 "El archivo es demasiado grande. Tamaño máximo: 10MB");
         }
-        
-        // Validar tipo de archivo (opcional - puedes personalizar)
+
+        // 🔒 SEGURIDAD: Validar extensión del archivo contra whitelist
+        String nombreArchivo = file.getOriginalFilename();
+        if (nombreArchivo == null || nombreArchivo.trim().isEmpty()) {
+            throw new FileStorageException("Nombre de archivo inválido");
+        }
+
+        String extension = obtenerExtension(nombreArchivo).toLowerCase();
+
+        if (!EXTENSIONES_PERMITIDAS.contains(extension)) {
+            throw new FileStorageException(
+                "Tipo de archivo no permitido. Solo se aceptan: " +
+                String.join(", ", EXTENSIONES_PERMITIDAS));
+        }
+
+        // Validar que no sea un archivo ejecutable (doble verificación)
+        if (extension.matches(".*\\.(exe|bat|cmd|sh|ps1|jar|com|scr|vbs|dll)$")) {
+            throw new FileStorageException("Archivos ejecutables no están permitidos");
+        }
+
+        // Validar tipo de archivo (content-type)
         String contentType = file.getContentType();
         if (contentType == null) {
             throw new FileStorageException("Tipo de archivo no válido");
         }
+    }
+
+    /**
+     * Obtiene la extensión de un archivo
+     * @param nombreArchivo Nombre del archivo
+     * @return Extensión con el punto (ej: ".pdf")
+     */
+    private String obtenerExtension(String nombreArchivo) {
+        int lastDot = nombreArchivo.lastIndexOf('.');
+        if (lastDot > 0 && lastDot < nombreArchivo.length() - 1) {
+            return nombreArchivo.substring(lastDot).toLowerCase();
+        }
+        return "";
     }
     
     /**

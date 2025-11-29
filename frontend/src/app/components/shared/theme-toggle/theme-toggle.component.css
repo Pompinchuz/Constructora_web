@@ -1,0 +1,71 @@
+/* ============================================ */
+/* THEME-TOGGLE.COMPONENT.CSS - Estilos del Toggle */
+/* ============================================ */
+
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: transparent;
+}
+
+/* Estilos para navbar transparente */
+.navbar.transparent .theme-toggle-btn {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.navbar.transparent .theme-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Estilos para navbar con scroll */
+.navbar.scrolled .theme-toggle-btn {
+  color: #374151;
+  background-color: rgba(37, 99, 235, 0.05);
+  border: 1px solid rgba(37, 99, 235, 0.1);
+}
+
+.navbar.scrolled .theme-toggle-btn:hover {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Icono */
+.theme-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle-btn:hover .theme-icon {
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* Animación al cambiar */
+.theme-toggle-btn:active .theme-icon {
+  transform: rotate(180deg) scale(0.9);
+}
+
+/* Estilos específicos para dark mode */
+[data-theme="dark"] .theme-toggle-btn {
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .navbar.scrolled .theme-toggle-btn {
+  background-color: rgba(148, 163, 184, 0.1);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .navbar.scrolled .theme-toggle-btn:hover {
+  background-color: rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+}

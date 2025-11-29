@@ -1,1 +1,158 @@
-<p>mis-solicitudes works!</p>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-7xl mx-auto">
+
+    <!-- Header -->
+    <div class="bg-white rounded-xl shadow-md p-6 mb-6">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Mis Solicitudes</h1>
+          <p class="text-gray-600">Gestiona tus solicitudes de presupuesto</p>
+        </div>
+        <a routerLink="/cliente/nueva-solicitud"
+           class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 font-semibold transition-all duration-300 hover:shadow-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+          </svg>
+          Nueva Solicitud
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="flex justify-center items-center py-12">
+      <div class="flex flex-col items-center space-y-4">
+        <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600"></div>
+        <p class="text-gray-600 font-medium">Cargando solicitudes...</p>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && solicitudes.length === 0" class="bg-white rounded-xl shadow-md p-12 text-center">
+      <div class="text-gray-400 mb-6">
+        <svg class="w-24 h-24 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+      </div>
+      <h3 class="text-2xl font-bold text-gray-700 mb-2">No tienes solicitudes aún</h3>
+      <p class="text-gray-500 mb-6">Crea tu primera solicitud para obtener un presupuesto personalizado</p>
+      <a routerLink="/cliente/nueva-solicitud"
+         class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-semibold transition-all duration-300 hover:shadow-lg">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Crear Primera Solicitud
+      </a>
+    </div>
+
+    <!-- Lista de Solicitudes -->
+    <div *ngIf="!loading && solicitudes.length > 0" class="space-y-4">
+      <div *ngFor="let solicitud of solicitudes"
+           class="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden">
+
+        <!-- Encabezado de la tarjeta -->
+        <div class="p-6">
+          <div class="flex flex-col md:flex-row justify-between items-start gap-4">
+
+            <!-- Información Principal -->
+            <div class="flex-1">
+              <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 mt-1">
+                  <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                </div>
+                <div class="flex-1">
+                  <h3 class="text-xl font-bold text-gray-900 mb-2">{{ solicitud.titulo }}</h3>
+                  <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ solicitud.descripcion }}</p>
+
+                  <!-- Metadatos -->
+                  <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                      </svg>
+                      <span>{{ solicitud.fechaSolicitud | date:'dd/MM/yyyy HH:mm' }}</span>
+                    </div>
+
+                    <div *ngIf="solicitud.archivoAdjunto" class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                      </svg>
+                      <span>Archivo adjunto</span>
+                    </div>
+
+                    <div *ngIf="solicitud.fechaRevision" class="flex items-center gap-1">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span>Revisada: {{ solicitud.fechaRevision | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estado Badge -->
+            <div class="flex-shrink-0">
+              <span class="inline-flex items-center gap-1 px-4 py-2 text-sm font-bold rounded-full"
+                    [ngClass]="{
+                      'bg-yellow-100 text-yellow-800 border-2 border-yellow-300': solicitud.estado === 'PENDIENTE',
+                      'bg-blue-100 text-blue-800 border-2 border-blue-300': solicitud.estado === 'EN_REVISION',
+                      'bg-green-100 text-green-800 border-2 border-green-300': solicitud.estado === 'APROBADA',
+                      'bg-red-100 text-red-800 border-2 border-red-300': solicitud.estado === 'RECHAZADA'
+                    }">
+                <svg *ngIf="solicitud.estado === 'PENDIENTE'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                </svg>
+                <svg *ngIf="solicitud.estado === 'EN_REVISION'" class="w-4 h-4 animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"></path>
+                </svg>
+                <svg *ngIf="solicitud.estado === 'APROBADA'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <svg *ngIf="solicitud.estado === 'RECHAZADA'" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                </svg>
+                {{ getEstadoLabel(solicitud.estado) }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Motivo de Rechazo -->
+          <div *ngIf="solicitud.motivoRechazo" class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg">
+            <div class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-bold text-red-800 mb-1">Motivo de Rechazo:</p>
+                <p class="text-sm text-red-700">{{ solicitud.motivoRechazo }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información Adicional (si está aprobada) -->
+          <div *ngIf="solicitud.estado === 'APROBADA'" class="mt-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg">
+            <div class="flex items-start gap-2">
+              <svg class="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <div>
+                <p class="text-sm font-bold text-green-800 mb-1">Solicitud Aprobada</p>
+                <p class="text-sm text-green-700">Tu solicitud ha sido aprobada. Pronto recibirás una proforma detallada por correo electrónico.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

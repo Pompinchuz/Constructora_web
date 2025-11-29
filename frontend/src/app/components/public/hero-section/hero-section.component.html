@@ -4,8 +4,8 @@
 
 <div class="hero-section">
   
-    <!-- Fondo con gradiente -->
-    <div class="hero-background">
+    <!-- Fondo con imagen dinámica desde backend -->
+    <div class="hero-background" [style.background-image]="imagenPortada ? 'url(' + imagenPortada + ')' : 'none'">
       <div class="hero-overlay"></div>
     </div>
   
