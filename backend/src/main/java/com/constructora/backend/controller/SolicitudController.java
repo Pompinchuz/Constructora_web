@@ -1,6 +1,3 @@
-// ============================================
-// SOLICITUD CONTROLLER
-// ============================================
 
 // SolicitudController.java
 package com.constructora.backend.controller;

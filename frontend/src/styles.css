@@ -142,8 +142,8 @@
 
     /* Colores de texto claros */
     --text-primary: #f1f5f9;    /* slate-100 */
-    --text-secondary: #cbd5e1;  /* slate-300 */
-    --text-tertiary: #94a3b8;   /* slate-400 */
+    --text-secondary: #f6faff;  /* slate-300 */
+    --text-tertiary: #e4ecf8;   /* slate-400 */
     --text-inverse: #0f172a;    /* slate-900 */
 
     /* Ajustar grises para dark mode */
@@ -1219,7 +1219,7 @@
 
   /* Textos - Sobrescribir clases de Tailwind */
   [data-theme="dark"] .text-gray-900 {
-    color: #f1f5f9 !important;
+    color: #0f0e0e !important;
   }
 
   [data-theme="dark"] .text-gray-800 {
@@ -1231,7 +1231,7 @@
   }
 
   [data-theme="dark"] .text-gray-600 {
-    color: #94a3b8 !important;
+    color: #020202 !important;
   }
 
   [data-theme="dark"] .text-gray-500 {
