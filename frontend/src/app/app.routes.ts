@@ -171,6 +171,12 @@ export const routes: Routes = [
         loadComponent: () => import('./components/cliente/subir-comprobante/subir-comprobante.component')
           .then(m => m.SubirComprobanteComponent),
         title: 'Subir Comprobante'
+      },
+      {
+        path: 'aprobacion-proyectos',
+        loadComponent: () => import('./components/cliente/aprobacion-proyectos/aprobacion-proyectos.component')
+          .then(m => m.AprobacionProyectosComponent),
+        title: 'Aprobación de Proyectos'
       }
     ]
   },
