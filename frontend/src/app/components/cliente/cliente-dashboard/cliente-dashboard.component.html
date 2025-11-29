@@ -6,30 +6,35 @@
     </div>
   
     <!-- Estadísticas Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
       <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
         <p class="text-gray-500 text-sm font-medium">Total Solicitudes</p>
         <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.totalSolicitudes }}</p>
       </div>
-  
+
       <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
         <p class="text-gray-500 text-sm font-medium">Solicitudes Pendientes</p>
         <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.solicitudesPendientes }}</p>
       </div>
-  
+
       <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
         <p class="text-gray-500 text-sm font-medium">Total Proformas</p>
         <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.totalProformas }}</p>
       </div>
-  
+
       <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
         <p class="text-gray-500 text-sm font-medium">Proformas Pendientes</p>
         <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.proformasPendientes }}</p>
       </div>
+
+      <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+        <p class="text-gray-500 text-sm font-medium">Proyectos por Aprobar</p>
+        <p class="text-3xl font-bold text-gray-900 mt-2">{{ estadisticas.proyectosPendientesAprobacion }}</p>
+      </div>
     </div>
   
     <!-- Acciones Rápidas -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <a routerLink="/cliente/nueva-solicitud" class="block bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-center">
           <svg class="w-12 h-12 mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -41,7 +46,7 @@
           </div>
         </div>
       </a>
-  
+
       <a routerLink="/cliente/mis-solicitudes" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-center">
           <div class="bg-blue-100 rounded-full p-3 mr-4">
@@ -55,7 +60,7 @@
           </div>
         </div>
       </a>
-  
+
       <a routerLink="/cliente/mis-proformas" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow">
         <div class="flex items-center">
           <div class="bg-green-100 rounded-full p-3 mr-4">
@@ -66,6 +71,26 @@
           <div>
             <h3 class="font-semibold text-gray-900">Mis Proformas</h3>
             <p class="text-sm text-gray-600">Ver todas</p>
+          </div>
+        </div>
+      </a>
+
+      <a routerLink="/cliente/aprobacion-proyectos" class="block bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+         [class.ring-2]="estadisticas.proyectosPendientesAprobacion > 0"
+         [class.ring-orange-500]="estadisticas.proyectosPendientesAprobacion > 0">
+        <div class="flex items-center">
+          <div class="bg-orange-100 rounded-full p-3 mr-4">
+            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-gray-900">Aprobar Proyectos</h3>
+            <p class="text-sm text-gray-600">Gestionar aprobaciones</p>
+            <span *ngIf="estadisticas.proyectosPendientesAprobacion > 0"
+                  class="inline-block mt-1 px-2 py-1 text-xs font-semibold bg-orange-100 text-orange-800 rounded">
+              {{ estadisticas.proyectosPendientesAprobacion }} pendientes
+            </span>
           </div>
         </div>
       </a>

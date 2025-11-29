@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { SolicitudService } from '../../../services/solicitud.service';
 import { ProformaService } from '../../../services/proforma.service';
+import { ProyectoService } from '../../../services/proyecto.service';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -23,9 +24,10 @@ export class ClienteDashboardComponent implements OnInit {
     totalSolicitudes: 0,
     solicitudesPendientes: 0,
     totalProformas: 0,
-    proformasPendientes: 0
+    proformasPendientes: 0,
+    proyectosPendientesAprobacion: 0
   };
-  
+
   ultimasSolicitudes: any[] = [];
   ultimasProformas: any[] = [];
   loading = true;
@@ -33,7 +35,8 @@ export class ClienteDashboardComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private solicitudService: SolicitudService,
-    private proformaService: ProformaService
+    private proformaService: ProformaService,
+    private proyectoService: ProyectoService
   ) {}
 
   ngOnInit(): void {
@@ -71,6 +74,18 @@ export class ClienteDashboardComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
+      }
+    });
+
+    // Cargar proyectos pendientes de aprobación
+    this.proyectoService.obtenerProyectosPendientes().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.estadisticas.proyectosPendientesAprobacion = response.data.length;
+        }
+      },
+      error: (err) => {
+        console.error('Error al cargar proyectos pendientes', err);
       }
     });
   }
