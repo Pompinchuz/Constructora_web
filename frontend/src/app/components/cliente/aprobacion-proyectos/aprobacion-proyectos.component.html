@@ -1,0 +1,186 @@
+<!-- ============================================ -->
+<!-- APROBACION PROYECTOS TEMPLATE -->
+<!-- ============================================ -->
+
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2 class="mb-0">Aprobación de Proyectos</h2>
+      <p class="text-muted">Gestione las solicitudes de publicación de sus proyectos</p>
+    </div>
+  </div>
+
+  <!-- Tabs de navegación -->
+  <ul class="nav nav-tabs mb-4">
+    <li class="nav-item">
+      <a class="nav-link"
+         [class.active]="vistaActual === 'pendientes'"
+         (click)="cambiarVista('pendientes')"
+         style="cursor: pointer;">
+        Pendientes de Aprobación
+        <span *ngIf="proyectosPendientes.length > 0" class="badge bg-warning ms-2">
+          {{ proyectosPendientes.length }}
+        </span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link"
+         [class.active]="vistaActual === 'todos'"
+         (click)="cambiarVista('todos')"
+         style="cursor: pointer;">
+        Todos Mis Proyectos
+      </a>
+    </li>
+  </ul>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Vista de Proyectos Pendientes -->
+  <div *ngIf="!loading && vistaActual === 'pendientes'">
+    <div *ngIf="proyectosPendientes.length === 0" class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i>
+      No tienes proyectos pendientes de aprobación
+    </div>
+
+    <div class="row">
+      <div class="col-md-6 col-lg-4 mb-4" *ngFor="let proyecto of proyectosPendientes">
+        <div class="card h-100 shadow-sm">
+          <img *ngIf="proyecto.imagenPrincipal"
+               [src]="proyecto.imagenPrincipal"
+               class="card-img-top"
+               alt="{{ proyecto.nombre }}"
+               style="height: 200px; object-fit: cover;">
+
+          <div class="card-body">
+            <h5 class="card-title">{{ proyecto.nombre }}</h5>
+            <p class="card-text text-muted small">{{ proyecto.descripcion }}</p>
+
+            <div class="mb-2">
+              <small class="text-muted">
+                <i class="bi bi-geo-alt me-1"></i>{{ proyecto.ubicacion || 'No especificado' }}
+              </small>
+            </div>
+
+            <div class="mb-3">
+              <span [class]="obtenerEstadoBadge(proyecto.estadoAprobacion)">
+                {{ obtenerTextoEstado(proyecto.estadoAprobacion) }}
+              </span>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button class="btn btn-success" (click)="aprobarProyecto(proyecto)">
+                <i class="bi bi-check-circle me-1"></i> Aprobar Publicación
+              </button>
+              <button class="btn btn-outline-danger" (click)="abrirModalRechazo(proyecto)">
+                <i class="bi bi-x-circle me-1"></i> Rechazar
+              </button>
+            </div>
+          </div>
+
+          <div class="card-footer bg-transparent border-top-0">
+            <small class="text-muted">
+              Solicitado el: {{ proyecto.fechaSolicitudAprobacion | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vista de Todos los Proyectos -->
+  <div *ngIf="!loading && vistaActual === 'todos'">
+    <div *ngIf="todosProyectos.length === 0" class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i>
+      No tienes proyectos registrados
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover" *ngIf="todosProyectos.length > 0">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Ubicación</th>
+            <th>Estado</th>
+            <th>Fecha Solicitud</th>
+            <th>Fecha Respuesta</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let proyecto of todosProyectos">
+            <td>
+              <strong>{{ proyecto.nombre }}</strong>
+              <br>
+              <small class="text-muted">{{ proyecto.descripcion }}</small>
+            </td>
+            <td>{{ proyecto.ubicacion || 'N/A' }}</td>
+            <td>
+              <span [class]="obtenerEstadoBadge(proyecto.estadoAprobacion)">
+                {{ obtenerTextoEstado(proyecto.estadoAprobacion) }}
+              </span>
+            </td>
+            <td>
+              <small>{{ proyecto.fechaSolicitudAprobacion | date:'dd/MM/yyyy HH:mm' }}</small>
+            </td>
+            <td>
+              <small>{{ proyecto.fechaRespuestaCliente ? (proyecto.fechaRespuestaCliente | date:'dd/MM/yyyy HH:mm') : '-' }}</small>
+            </td>
+            <td>
+              <div *ngIf="proyecto.estadoAprobacion === EstadoAprobacion.PENDIENTE_APROBACION">
+                <button class="btn btn-sm btn-success me-1" (click)="aprobarProyecto(proyecto)">
+                  <i class="bi bi-check"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="abrirModalRechazo(proyecto)">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+              <span *ngIf="proyecto.estadoAprobacion === EstadoAprobacion.RECHAZADO && proyecto.motivoRechazo"
+                    class="text-muted small">
+                Motivo: {{ proyecto.motivoRechazo }}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Rechazo -->
+<div class="modal" [class.show]="mostrarModalRechazo" [style.display]="mostrarModalRechazo ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Rechazar Publicación del Proyecto</h5>
+        <button type="button" class="btn-close" (click)="cerrarModalRechazo()"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Está seguro de rechazar la publicación del proyecto <strong>{{ proyectoSeleccionado?.nombre }}</strong>?</p>
+
+        <div class="mb-3">
+          <label for="motivoRechazo" class="form-label">Motivo del rechazo *</label>
+          <textarea
+            id="motivoRechazo"
+            class="form-control"
+            rows="4"
+            [(ngModel)]="motivoRechazo"
+            placeholder="Por favor, explique el motivo del rechazo..."
+            maxlength="500"></textarea>
+          <small class="text-muted">{{ motivoRechazo.length }}/500 caracteres</small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cerrarModalRechazo()">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="rechazarProyecto()">Rechazar Proyecto</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop del Modal -->
+<div class="modal-backdrop fade" [class.show]="mostrarModalRechazo" *ngIf="mostrarModalRechazo"></div>
