@@ -414,6 +414,44 @@ public class ContenidoController {
     }
 
     // ============================================
+    // ENDPOINTS TEMPORALES PARA DESARROLLO/DEBUG
+    // ============================================
+
+    /**
+     * Listar todos los clientes disponibles (solo para admin)
+     * GET /api/contenido/admin/clientes
+     */
+    @GetMapping("/admin/clientes")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<List<java.util.Map<String, Object>>>> listarClientesParaProyectos() {
+        log.info("Admin listando clientes disponibles");
+
+        List<Cliente> clientes = clienteRepository.findAll();
+
+        List<java.util.Map<String, Object>> clientesInfo = clientes.stream()
+            .map(c -> {
+                java.util.Map<String, Object> info = new java.util.HashMap<>();
+                info.put("id", c.getId());
+                info.put("nombre", c.getNombreCompleto());
+                info.put("email", c.getUsuario().getCorreoElectronico());
+                info.put("telefono", c.getTelefono());
+                return info;
+            })
+            .collect(java.util.stream.Collectors.toList());
+
+        log.info("Se encontraron {} clientes", clientesInfo.size());
+
+        return ResponseEntity.ok(
+            ApiResponseDTO.<List<java.util.Map<String, Object>>>builder()
+                .success(true)
+                .message("Clientes obtenidos - Total: " + clientesInfo.size())
+                .data(clientesInfo)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+
+    // ============================================
     // MÉTODOS AUXILIARES
     // ============================================
 
