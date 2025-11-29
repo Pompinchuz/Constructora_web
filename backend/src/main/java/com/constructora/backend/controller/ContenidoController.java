@@ -324,6 +324,8 @@ public class ContenidoController {
         List<ProyectoExitosoResponseDTO> proyectos =
                 contenidoService.obtenerProyectosPendientesCliente(clienteId);
 
+        log.info("Se encontraron {} proyectos pendientes para el cliente {}", proyectos.size(), clienteId);
+
         return ResponseEntity.ok(
             ApiResponseDTO.<List<ProyectoExitosoResponseDTO>>builder()
                 .success(true)
@@ -412,13 +414,55 @@ public class ContenidoController {
     }
 
     // ============================================
+    // ENDPOINTS TEMPORALES PARA DESARROLLO/DEBUG
+    // ============================================
+
+    /**
+     * Listar todos los clientes disponibles (solo para admin)
+     * GET /api/contenido/admin/clientes
+     */
+    @GetMapping("/admin/clientes")
+    @PreAuthorize("hasAuthority('ADMINISTRADOR')")
+    public ResponseEntity<ApiResponseDTO<List<java.util.Map<String, Object>>>> listarClientesParaProyectos() {
+        log.info("Admin listando clientes disponibles");
+
+        List<Cliente> clientes = clienteRepository.findAll();
+
+        List<java.util.Map<String, Object>> clientesInfo = clientes.stream()
+            .map(c -> {
+                java.util.Map<String, Object> info = new java.util.HashMap<>();
+                info.put("id", c.getId());
+                info.put("nombre", c.getNombreCompleto());
+                info.put("email", c.getUsuario().getCorreoElectronico());
+                info.put("telefono", c.getTelefono());
+                return info;
+            })
+            .collect(java.util.stream.Collectors.toList());
+
+        log.info("Se encontraron {} clientes", clientesInfo.size());
+
+        return ResponseEntity.ok(
+            ApiResponseDTO.<List<java.util.Map<String, Object>>>builder()
+                .success(true)
+                .message("Clientes obtenidos - Total: " + clientesInfo.size())
+                .data(clientesInfo)
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    }
+
+    // ============================================
     // MÉTODOS AUXILIARES
     // ============================================
 
     private Long obtenerClienteId(Authentication authentication) {
         String email = authentication.getName(); // El username es el email
+        log.info("Obteniendo clienteId para el email: {}", email);
+
         Cliente cliente = clienteRepository.findByCorreoElectronico(email)
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado para el usuario autenticado"));
+                .orElseThrow(() -> new NotFoundException("Cliente no encontrado para el usuario autenticado: " + email));
+
+        log.info("Cliente encontrado - ID: {}, Nombre: {}", cliente.getId(), cliente.getNombreCompleto());
         return cliente.getId();
     }
 }
