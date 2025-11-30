@@ -48,16 +48,26 @@ public class SolicitudController {
     public ResponseEntity<ApiResponseDTO<SolicitudProformaResponseDTO>> crearSolicitud(
             @RequestParam("titulo") String titulo,
             @RequestParam("descripcion") String descripcion,
+            @RequestParam(value = "fechaInicio", required = false) String fechaInicio,
+            @RequestParam(value = "fechaFinalizacion", required = false) String fechaFinalizacion,
             @RequestParam(value = "archivo", required = false) MultipartFile archivo,
             Authentication authentication) {
-        
+
         Long clienteId = obtenerClienteId(authentication);
-        
+
         SolicitudProformaDTO dto = new SolicitudProformaDTO();
         dto.setTitulo(titulo);
         dto.setDescripcion(descripcion);
         dto.setArchivo(archivo);
-        
+
+        // Parsear fechas si están presentes
+        if (fechaInicio != null && !fechaInicio.isEmpty()) {
+            dto.setFechaInicio(java.time.LocalDate.parse(fechaInicio));
+        }
+        if (fechaFinalizacion != null && !fechaFinalizacion.isEmpty()) {
+            dto.setFechaFinalizacion(java.time.LocalDate.parse(fechaFinalizacion));
+        }
+
         log.info("Cliente {} creando solicitud: {}", clienteId, titulo);
         
         SolicitudProformaResponseDTO response = solicitudService.crearSolicitud(clienteId, dto);
