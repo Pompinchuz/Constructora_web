@@ -2322,3 +2322,23 @@
     border-color: transparent #1e293b transparent transparent;
     filter: drop-shadow(-1px 0 0 #475569);
   }
+
+  /* ========================================= */
+/* FIX GLOBAL: Asegurar textos visibles en tablas */
+/* ========================================= */
+
+table,
+.table,
+.table td,
+.table th,
+.table tr {
+  color: var(--gray-900) !important;      /* azul/gris oscuro */
+}
+
+[data-theme="dark"] table,
+[data-theme="dark"] .table,
+[data-theme="dark"] .table td,
+[data-theme="dark"] .table th,
+[data-theme="dark"] .table tr {
+  color: var(--gray-100) !important;      /* texto claro para dark mode */
+}

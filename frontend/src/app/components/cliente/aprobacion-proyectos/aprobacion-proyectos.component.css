@@ -1,28 +1,269 @@
 /* ============================================ */
-/* APROBACION PROYECTOS STYLES */
+/* ESTILOS MODERNOS AZULES - APROBACIÓN PROYECTOS */
 /* ============================================ */
 
+/* ======================= */
+/* Tarjetas de proyectos   */
+/* ======================= */
+
 .card {
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform .25s ease, box-shadow .25s ease;
+  border: 1px solid rgba(0, 60, 120, 0.12);
+  border-radius: 12px;
 }
 
 .card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-6px);
+  box-shadow: 0 0.8rem 1.4rem rgba(0, 80, 160, 0.20);
 }
 
-.modal.show {
-  background-color: rgba(0, 0, 0, 0.5);
+/* Títulos más destacados */
+.card-title {
+  color: #004A8F;
+  font-weight: 600;
 }
 
-.nav-link {
-  transition: all 0.3s ease;
+/* ======================= */
+/* Tabs naveación          */
+/* ======================= */
+
+.nav-tabs .nav-link {
+  color: #004A8F;
+  font-weight: 500;
+  border-radius: 8px 8px 0 0;
+  padding: 10px 18px;
 }
 
-.nav-link:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+.nav-tabs .nav-link.active {
+  background-color: #E8F1FE;
+  border-color: #BBD5F5 #BBD5F5 transparent;
+  font-weight: 600;
 }
+
+.nav-tabs .nav-link:hover {
+  background-color: #F0F6FF;
+  color: #003A75;
+}
+
+/* ======================= */
+/* Botones                 */
+/* ======================= */
 
 .btn {
-  transition: all 0.2s ease;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: transform .15s ease, box-shadow .2s ease;
+}
+
+.btn-success {
+  background-color: #0A7B32;
+  border-color: #0A7B32;
+}
+
+.btn-success:hover {
+  background-color: #099430;
+  transform: translateY(-2px);
+}
+
+.btn-outline-danger:hover {
+  transform: translateY(-2px);
+}
+
+.btn-danger:hover {
+  transform: translateY(-2px);
+}
+
+/* ======================= */
+/* Badges de estados       */
+/* ======================= */
+
+.badge {
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-weight: 600 !important;
+}
+
+.badge.bg-warning {
+  background-color: #FFC107 !important;
+  color: #674300;
+}
+
+.badge.bg-success {
+  background-color: #0A7B32 !important;
+}
+
+.badge.bg-danger {
+  background-color: #D93025 !important;
+}
+
+/* ======================= */
+/* Modal Moderno Azul      */
+/* ======================= */
+
+.modal {
+  transition: opacity 0.25s;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal.show .modal-dialog {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.modal .modal-dialog {
+  transform: translateY(-20px);
+  transition: transform .25s ease, opacity .25s ease;
+  opacity: 0;
+}
+
+.modal-content {
+  border-radius: 14px;
+  border: 2px solid #C2D8FF;
+  box-shadow: 0 1rem 2rem rgba(0, 60, 120, 0.25);
+}
+
+.modal-header {
+  background: #E9F2FF;
+  border-bottom: 1px solid #C2D8FF;
+}
+
+.modal-title {
+  color: #004B9D;
+  font-weight: 600;
+}
+
+.modal-footer .btn-danger {
+  background-color: #D93025;
+  border-color: #D93025;
+}
+
+/* Backdrop */
+.modal-backdrop {
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.modal-backdrop.show {
+  opacity: 0.5;
+}
+
+/* ======================= */
+/* Spinner Azul Premium    */
+/* ======================= */
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: .3rem;
+  color: #004A8F;
+}
+
+
+/* ======================================= */
+/* TABLA ESTILIZADA AZUL + RESPONSIVE REAL */
+/* ======================================= */
+
+.table-responsive {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #90B4E8 #E5EEFF;
+}
+
+/* Scrollbar en Chrome */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #E5EEFF;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #90B4E8;
+  border-radius: 4px;
+}
+
+/* Tabla estética */
+.table {
+  border-collapse: separate;
+  border-spacing: 0 8px;
+}
+
+.table thead th {
+  background: #E9F2FF;
+  color: #003D7A;
+  border: none;
+  font-weight: 600;
+  padding: 12px;
+}
+
+.table tbody tr {
+  background: white;
+  border-radius: 12px;
+}
+
+.table tbody tr td {
+  padding: 14px;
+  vertical-align: middle;
+}
+
+/* Bordes redondeados en cada fila */
+.table tbody tr {
+  box-shadow: 0 2px 6px rgba(0, 55, 120, 0.10);
+  border-radius: 12px;
+}
+
+.table tbody tr td:first-child {
+  border-radius: 12px 0 0 12px;
+}
+
+.table tbody tr td:last-child {
+  border-radius: 0 12px 12px 0;
+}
+
+/* Limitar textos largos */
+.table td small,
+.table td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+/* Permitir que algunas columnas sí se envuelvan */
+.table td:nth-child(1) small {
+  white-space: normal !important;
+}
+
+/* Columna de descripción controlada */
+.table td strong {
+  display: block;
+  white-space: normal;
+}
+
+/* Ajustar ancho de columnas específicas */
+.table td:nth-child(3),
+.table th:nth-child(3) {
+  width: 130px; /* Estado */
+}
+
+.table td:nth-child(4),
+.table td:nth-child(5) {
+  width: 160px; /* Fechas */
+}
+
+/* Responsividad real para pantallas pequeñas */
+@media (max-width: 768px) {
+  .table td,
+  .table th {
+    max-width: 120px;
+  }
+}
+
+
+/* FORZAR colores de texto correctos */
+.table td,
+.table th,
+.table tr {
+  color: #0A1F3C !important;  /* azul oscuro */
 }
