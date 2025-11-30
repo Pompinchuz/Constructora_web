@@ -39,7 +39,7 @@ backend/src/main/resources/*.properties
 
 
 
-/backend/src/main/resources/application-prod.properties
+
 
 
 /backend/uploads/
