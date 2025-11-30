@@ -1,0 +1,69 @@
+# ============================================
+# CONFIGURACIÓN DE NETLIFY - ANGULAR
+# ============================================
+
+[build]
+  # Directorio base
+  base = "frontend"
+
+  # Comando de build
+  command = "npm run build"
+
+  # Directorio de publicación (donde se genera el build)
+  publish = "dist/frontend/browser"
+
+# ============================================
+# CONFIGURACIÓN DE PRODUCCIÓN
+# ============================================
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+# ============================================
+# REDIRECCIONES PARA ANGULAR SPA
+# ============================================
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+# ============================================
+# HEADERS DE SEGURIDAD
+# ============================================
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Headers específicos para archivos estáticos
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ============================================
+# CONFIGURACIÓN DE CONTEXTOS
+# ============================================
+[context.production]
+  environment = { NODE_ENV = "production" }
+
+[context.deploy-preview]
+  environment = { NODE_ENV = "staging" }
+
+[context.branch-deploy]
+  environment = { NODE_ENV = "development" }
