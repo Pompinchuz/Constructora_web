@@ -36,3 +36,15 @@ build/
 # Ignorar archivos sensibles
 backend/src/main/resources/*.properties
 *.env
+
+
+
+/backend/src/main/resources/application-prod.properties
+
+
+/backend/uploads/
+
+
+*.log
+*.tmp
+*.swp
