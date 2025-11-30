@@ -117,19 +117,56 @@ public class EmailService {
             context.setVariable("titulo", solicitud.getTitulo());
             context.setVariable("motivo", solicitud.getMotivoRechazo());
             context.setVariable("appUrl", appUrl);
-            
+
             String htmlContent = templateEngine.process("email/solicitud-rechazada", context);
-            
+
             enviarEmailHtml(
                 solicitud.getCliente().getUsuario().getCorreoElectronico(),
                 "Solicitud Rechazada - " + appName,
                 htmlContent
             );
-            
+
             log.info("Notificación de rechazo enviada para solicitud ID: {}", solicitud.getId());
-            
+
         } catch (Exception e) {
             log.error("Error al enviar notificación de rechazo: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Notifica al cliente que debe aprobar la publicación de su proyecto
+     */
+    @Async
+    public void notificarProyectoPendienteAprobacion(com.constructora.backend.entity.Cliente cliente,
+                                                      com.constructora.backend.entity.ProyectoExitoso proyecto) {
+        try {
+            String mensaje = String.format(
+                "Estimado/a %s,\n\n" +
+                "Su solicitud ha sido aprobada y hemos creado un proyecto para su visualización.\n\n" +
+                "Nombre del Proyecto: %s\n" +
+                "Descripción: %s\n\n" +
+                "Para que el proyecto sea publicado en nuestra página web, necesitamos su autorización.\n" +
+                "Por favor, ingrese a su panel de cliente en la sección 'Aprobación de Proyectos' para revisar y aprobar la publicación.\n\n" +
+                "Link: %s/cliente/aprobacion-proyectos\n\n" +
+                "Saludos,\n%s",
+                cliente.getNombreCompleto(),
+                proyecto.getNombre(),
+                proyecto.getDescripcion() != null ? proyecto.getDescripcion() : "Sin descripción",
+                appUrl,
+                appName
+            );
+
+            enviarEmailSimple(
+                cliente.getUsuario().getCorreoElectronico(),
+                "Proyecto Pendiente de Aprobación - " + appName,
+                mensaje
+            );
+
+            log.info("Notificación de proyecto pendiente enviada al cliente: {} para proyecto ID: {}",
+                     cliente.getNombreCompleto(), proyecto.getId());
+
+        } catch (Exception e) {
+            log.error("Error al notificar proyecto pendiente de aprobación: {}", e.getMessage());
         }
     }
     
