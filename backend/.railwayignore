@@ -1,0 +1,12 @@
+# Archivos a ignorar en Railway
+node_modules/
+target/
+*.log
+*.tmp
+.git/
+.idea/
+.vscode/
+.DS_Store
+*.iml
+uploads/*
+!uploads/.gitkeep
