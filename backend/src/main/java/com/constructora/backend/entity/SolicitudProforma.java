@@ -49,7 +49,11 @@ public class SolicitudProforma {
     
     @OneToOne(mappedBy = "solicitud")
     private Proforma proforma;
-    
+
+    @OneToOne
+    @JoinColumn(name = "proyectoId")
+    private ProyectoExitoso proyecto;
+
     @PrePersist
     protected void onCreate() {
         fechaSolicitud = LocalDateTime.now();

@@ -26,6 +26,7 @@ public class SolicitudProformaService {
     private final ClienteRepository clienteRepository;
     private final FileStorageService fileStorageService;
     private final EmailService emailService;
+    private final com.constructora.backend.repository.ProyectoExitosoRepository proyectoRepository;
     
     /**
      * Crear nueva solicitud de proforma
@@ -109,32 +110,65 @@ public class SolicitudProformaService {
      */
     @Transactional
     public SolicitudProformaResponseDTO cambiarEstado(
-            Long solicitudId, 
+            Long solicitudId,
             EstadoSolicitud nuevoEstado,
             String motivoRechazo,
             Long adminId) {
-        
+
         SolicitudProforma solicitud = solicitudRepository.findById(solicitudId)
                 .orElseThrow(() -> new NotFoundException("Solicitud no encontrada"));
-        
+
         EstadoSolicitud estadoAnterior = solicitud.getEstado();
         solicitud.setEstado(nuevoEstado);
         solicitud.setFechaRevision(LocalDateTime.now());
-        
+
         if (nuevoEstado == EstadoSolicitud.RECHAZADA && motivoRechazo != null) {
             solicitud.setMotivoRechazo(motivoRechazo);
         }
-        
+
+        // ============================================
+        // CREAR PROYECTO AUTOMÁTICAMENTE AL APROBAR
+        // ============================================
+        if (nuevoEstado == EstadoSolicitud.APROBADA && estadoAnterior != EstadoSolicitud.APROBADA) {
+            // Solo crear proyecto si no existe uno ya asociado
+            if (solicitud.getProyecto() == null) {
+                com.constructora.backend.entity.ProyectoExitoso proyecto = new com.constructora.backend.entity.ProyectoExitoso();
+                proyecto.setNombre(solicitud.getTitulo());
+                proyecto.setDescripcion(solicitud.getDescripcion());
+                proyecto.setCliente(solicitud.getCliente());
+                proyecto.setEstadoAprobacion(com.constructora.backend.entity.enums.EstadoAprobacionProyecto.PENDIENTE_APROBACION);
+                proyecto.setFechaSolicitudAprobacion(LocalDateTime.now());
+                proyecto.setActivo(false); // Inactivo hasta que el cliente apruebe
+
+                // Si hay archivo adjunto en la solicitud, usarlo como imagen principal
+                if (solicitud.getArchivoAdjunto() != null &&
+                    (solicitud.getArchivoAdjunto().toLowerCase().endsWith(".jpg") ||
+                     solicitud.getArchivoAdjunto().toLowerCase().endsWith(".jpeg") ||
+                     solicitud.getArchivoAdjunto().toLowerCase().endsWith(".png"))) {
+                    proyecto.setImagenPrincipal(solicitud.getArchivoAdjunto());
+                }
+
+                proyecto = proyectoRepository.save(proyecto);
+                solicitud.setProyecto(proyecto);
+
+                log.info("Proyecto {} creado automáticamente para solicitud {}",
+                        proyecto.getId(), solicitudId);
+
+                // Notificar al cliente que debe aprobar la publicación del proyecto
+                emailService.notificarProyectoPendienteAprobacion(solicitud.getCliente(), proyecto);
+            }
+        }
+
         solicitud = solicitudRepository.save(solicitud);
-        
-        log.info("Solicitud {} cambió de estado {} a {}", 
+
+        log.info("Solicitud {} cambió de estado {} a {}",
                 solicitudId, estadoAnterior, nuevoEstado);
-        
+
         // Notificar al cliente si fue rechazada
         if (nuevoEstado == EstadoSolicitud.RECHAZADA) {
             emailService.notificarSolicitudRechazada(solicitud);
         }
-        
+
         return mapearAResponse(solicitud);
     }
     
