@@ -3,6 +3,7 @@ package com.constructora.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.constructora.backend.entity.enums.EstadoSolicitud;
@@ -30,7 +31,10 @@ public class SolicitudProforma {
     
     @Column(length = 500)
     private String archivoAdjunto;
-    
+
+    private LocalDate fechaInicio;
+    private LocalDate fechaFinalizacion;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoSolicitud estado = EstadoSolicitud.PENDIENTE;

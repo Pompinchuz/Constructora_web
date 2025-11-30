@@ -41,8 +41,10 @@ public class SolicitudProformaService {
         solicitud.setCliente(cliente);
         solicitud.setTitulo(dto.getTitulo());
         solicitud.setDescripcion(dto.getDescripcion());
+        solicitud.setFechaInicio(dto.getFechaInicio());
+        solicitud.setFechaFinalizacion(dto.getFechaFinalizacion());
         solicitud.setEstado(EstadoSolicitud.PENDIENTE);
-        
+
         // Guardar archivo adjunto si existe
         if (dto.getArchivo() != null && !dto.getArchivo().isEmpty()) {
             String rutaArchivo = fileStorageService.guardarArchivo(dto.getArchivo(), "solicitudes");
@@ -135,6 +137,8 @@ public class SolicitudProformaService {
                 com.constructora.backend.entity.ProyectoExitoso proyecto = new com.constructora.backend.entity.ProyectoExitoso();
                 proyecto.setNombre(solicitud.getTitulo());
                 proyecto.setDescripcion(solicitud.getDescripcion());
+                proyecto.setFechaInicio(solicitud.getFechaInicio());
+                proyecto.setFechaFinalizacion(solicitud.getFechaFinalizacion());
                 proyecto.setCliente(solicitud.getCliente());
                 proyecto.setEstadoAprobacion(com.constructora.backend.entity.enums.EstadoAprobacionProyecto.PENDIENTE_APROBACION);
                 proyecto.setFechaSolicitudAprobacion(LocalDateTime.now());

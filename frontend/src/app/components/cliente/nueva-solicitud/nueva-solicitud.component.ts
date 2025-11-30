@@ -30,7 +30,9 @@ export class NuevaSolicitudComponent {
   ) {
     this.solicitudForm = this.fb.group({
       titulo: ['', Validators.required],
-      descripcion: ['', Validators.required]
+      descripcion: ['', Validators.required],
+      fechaInicio: [''],
+      fechaFinalizacion: ['']
     });
   }
 
@@ -53,7 +55,18 @@ export class NuevaSolicitudComponent {
     const formData = new FormData();
     formData.append('titulo', this.solicitudForm.get('titulo')?.value);
     formData.append('descripcion', this.solicitudForm.get('descripcion')?.value);
-    
+
+    // Agregar fechas si están presentes
+    const fechaInicio = this.solicitudForm.get('fechaInicio')?.value;
+    const fechaFinalizacion = this.solicitudForm.get('fechaFinalizacion')?.value;
+
+    if (fechaInicio) {
+      formData.append('fechaInicio', fechaInicio);
+    }
+    if (fechaFinalizacion) {
+      formData.append('fechaFinalizacion', fechaFinalizacion);
+    }
+
     if (this.archivoSeleccionado) {
       formData.append('archivo', this.archivoSeleccionado);
     }
@@ -80,4 +93,6 @@ export class NuevaSolicitudComponent {
 
   get titulo() { return this.solicitudForm.get('titulo'); }
   get descripcion() { return this.solicitudForm.get('descripcion'); }
+  get fechaInicio() { return this.solicitudForm.get('fechaInicio'); }
+  get fechaFinalizacion() { return this.solicitudForm.get('fechaFinalizacion'); }
 }

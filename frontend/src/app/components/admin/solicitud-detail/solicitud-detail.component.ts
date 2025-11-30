@@ -237,7 +237,8 @@ confirmarCambioEstado(): void {
 
   descargarArchivo(): void {
     if (this.solicitud?.archivoAdjunto) {
-      const url = `${this.apiUrl}/uploads/solicitudes/${this.solicitud.archivoAdjunto}`;
+      // El archivoAdjunto ya incluye el subdirectorio (ej: "solicitudes/archivo.jpg")
+      const url = `${this.apiUrl}/uploads/${this.solicitud.archivoAdjunto}`;
       window.open(url, '_blank');
     }
   }
