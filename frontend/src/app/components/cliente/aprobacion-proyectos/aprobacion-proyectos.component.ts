@@ -48,7 +48,7 @@ export class AprobacionProyectosComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.notificationService.showError('Error al cargar proyectos pendientes');
+        this.notificationService.error('Error al cargar proyectos pendientes');
         this.loading = false;
       }
     });
@@ -62,7 +62,7 @@ export class AprobacionProyectosComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        this.notificationService.showError('Error al cargar proyectos');
+        this.notificationService.error('Error al cargar proyectos');
         this.loading = false;
       }
     });
@@ -84,14 +84,14 @@ export class AprobacionProyectosComponent implements OnInit {
 
     this.proyectoService.aprobarProyecto(proyecto.id).subscribe({
       next: (response) => {
-        this.notificationService.showSuccess('Proyecto aprobado exitosamente');
+        this.notificationService.success('Proyecto aprobado exitosamente');
         this.cargarProyectosPendientes();
         if (this.vistaActual === 'todos') {
           this.cargarTodosProyectos();
         }
       },
       error: (error) => {
-        this.notificationService.showError('Error al aprobar el proyecto');
+        this.notificationService.success('Error al aprobar el proyecto');
       }
     });
   }
@@ -112,13 +112,13 @@ export class AprobacionProyectosComponent implements OnInit {
     if (!this.proyectoSeleccionado) return;
 
     if (!this.motivoRechazo || this.motivoRechazo.trim() === '') {
-      this.notificationService.showError('Debe proporcionar un motivo de rechazo');
+      this.notificationService.error('Debe proporcionar un motivo de rechazo');
       return;
     }
 
     this.proyectoService.rechazarProyecto(this.proyectoSeleccionado.id, this.motivoRechazo).subscribe({
       next: (response) => {
-        this.notificationService.showSuccess('Proyecto rechazado');
+        this.notificationService.success('Proyecto rechazado');
         this.cerrarModalRechazo();
         this.cargarProyectosPendientes();
         if (this.vistaActual === 'todos') {
@@ -126,7 +126,7 @@ export class AprobacionProyectosComponent implements OnInit {
         }
       },
       error: (error) => {
-        this.notificationService.showError('Error al rechazar el proyecto');
+        this.notificationService.error('Error al rechazar el proyecto');
       }
     });
   }
