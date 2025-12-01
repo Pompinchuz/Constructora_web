@@ -7,7 +7,7 @@
   base = "frontend"
 
   # Comando de build
-  command = "npm run build"
+  command = "npm run build:netlify"
 
   # Directorio de publicación (donde se genera el build)
   publish = "dist/frontend/browser"
