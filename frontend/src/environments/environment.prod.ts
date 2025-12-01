@@ -13,6 +13,9 @@ export const environment = {
   // URL para uploads (mismo dominio del backend)
   uploadUrl: 'https://constructoraweb-production.up.railway.app/uploads',
 
+ // backendBaseUrl: 'https://constructoraweb-production.up.railway.app',
+
+
   // Configuración de la aplicación
   appName: 'Constructora Sistema de Proformas',
   version: '1.0.0',
