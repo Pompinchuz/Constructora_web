@@ -8,10 +8,10 @@ export const environment = {
   // URL de tu backend en Railway
   // IMPORTANTE: Cambia esto por tu URL real de Railway después del despliegue
   // Ejemplo: https://constructora-backend-production.up.railway.app
-  apiUrl: 'https://tu-backend.railway.app',
+  apiUrl: 'https://constructoraweb-production.up.railway.app/api',
 
   // URL para uploads (mismo dominio del backend)
-  uploadUrl: 'https://tu-backend.railway.app/uploads',
+  uploadUrl: 'https://constructoraweb-production.up.railway.app/uploads',
 
   // Configuración de la aplicación
   appName: 'Constructora Sistema de Proformas',

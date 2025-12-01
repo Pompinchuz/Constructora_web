@@ -59,6 +59,8 @@ public class SecurityConfig {
                     "/files/**",
                     
                     // Otros
+                    "/api/test",
+                    "/api/health",
                     "/error",
                     "/actuator/health"
                 ).permitAll()
