@@ -19,8 +19,6 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
-import lombok.extern.slf4j.Slf4j;
-@Slf4j
 
 @Service
 public class FileStorageService {
@@ -118,33 +116,19 @@ public class FileStorageService {
         }
     }
     
-  public boolean eliminarArchivo(String rutaArchivo) {
-    try {
-        if (rutaArchivo == null || rutaArchivo.trim().isEmpty()) {
-            return false;
+    /**
+     * Elimina un archivo del sistema
+     * @param rutaArchivo Ruta relativa del archivo
+     * @return true si se eliminó correctamente
+     */
+    public boolean eliminarArchivo(String rutaArchivo) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(rutaArchivo).normalize();
+            return Files.deleteIfExists(filePath);
+        } catch (IOException ex) {
+            throw new FileStorageException("No se pudo eliminar el archivo: " + rutaArchivo, ex);
         }
-        
-        Path filePath = this.fileStorageLocation.resolve(rutaArchivo).normalize();
-        
-        // Verificar que el archivo existe antes de intentar eliminarlo
-        if (!Files.exists(filePath)) {
-            log.warn("Archivo no existe, no se puede eliminar: {}", rutaArchivo);
-        
-            return false;
-        }
-        
-        boolean deleted = Files.deleteIfExists(filePath);
-        if (deleted) {
-            log.info("Archivo eliminado exitosamente: {}", rutaArchivo);
-        }
-        return deleted;
-        
-    } catch (IOException ex) {
-        log.error("Error al eliminar archivo: {}", rutaArchivo, ex);
-        // NO lanzar excepción, solo registrar el error
-        return false;
     }
-}
     
     /**
      * Obtiene la ruta completa de un archivo
