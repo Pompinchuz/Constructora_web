@@ -10,7 +10,7 @@
   command = "npm run build:netlify"
 
   # Directorio de publicación (donde se genera el build)
-  publish = "dist/browser"
+  publish = "dist/frontend" 
 
 # ============================================
 # CONFIGURACIÓN DE PRODUCCIÓN
