@@ -1,10 +1,3 @@
-# ============================================
-# REDIRECCIONES PARA ANGULAR SPA
-# ============================================
-# Redirige todas las rutas a index.html para que Angular maneje el routing
-
 /*    /index.html   200
-
-# Si necesitas redirecciones específicas, agrégalas arriba de la regla general
-# Ejemplo:
-# /api/*  https://tu-backend.railway.app/api/:splat  200
+    
+*/
