@@ -69,7 +69,7 @@ import { ESTADOS_SOLICITUD_LABELS } from '../../constants/estados.constants';
             </button>
             <button *ngIf="solicitud.estado === 'APROBADA'"
                     [routerLink]="['/admin/crear-proforma', solicitud.id]"
-                    class="px-4 py-2 text-sm bg-purple-600 text-white rounded hover:bg-purple-700">
+                    class="px-4 py-2 text-sm bg-purple-600 rounded hover:bg-purple-700">
               Crear Proforma
             </button>
           </div>

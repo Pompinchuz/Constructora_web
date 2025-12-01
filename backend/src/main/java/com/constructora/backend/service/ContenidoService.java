@@ -149,41 +149,72 @@ public class ContenidoService {
     // GESTIÓN DE PROYECTOS
     // ============================================
     
-    @Transactional
-    public ProyectoExitosoResponseDTO crearProyecto(ProyectoExitosoDTO dto) {
+   @Transactional
+public ProyectoExitosoResponseDTO crearProyecto(ProyectoExitosoDTO dto) {
+    log.info("Iniciando creación de proyecto: {}", dto.getNombre());
+    
+    // 1. Validar datos básicos
+    if (dto.getNombre() == null || dto.getNombre().trim().isEmpty()) {
+        throw new BadRequestException("El nombre del proyecto es obligatorio");
+    }
+    
+    if (dto.getClienteId() == null) {
+        throw new BadRequestException("El ID del cliente es obligatorio");
+    }
 
-        // Verificar que el cliente existe
-        Cliente cliente = clienteRepository.findById(dto.getClienteId())
-                .orElseThrow(() -> new NotFoundException("Cliente no encontrado"));
+    // 2. Verificar que el cliente existe ANTES de procesar archivos
+    Cliente cliente = clienteRepository.findById(dto.getClienteId())
+            .orElseThrow(() -> new NotFoundException(
+                "Cliente no encontrado con ID: " + dto.getClienteId()));
+    
+    log.info("Cliente validado: {} (ID: {})", cliente.getNombreCompleto(), cliente.getId());
 
-        ProyectoExitoso proyecto = new ProyectoExitoso();
-        proyecto.setNombre(dto.getNombre());
-        proyecto.setDescripcion(dto.getDescripcion());
-        proyecto.setUbicacion(dto.getUbicacion());
-        proyecto.setFechaInicio(dto.getFechaInicio());
-        proyecto.setFechaFinalizacion(dto.getFechaFinalizacion());
+    // 3. Crear entidad del proyecto
+    ProyectoExitoso proyecto = new ProyectoExitoso();
+    proyecto.setNombre(dto.getNombre());
+    proyecto.setDescripcion(dto.getDescripcion());
+    proyecto.setUbicacion(dto.getUbicacion());
+    proyecto.setFechaInicio(dto.getFechaInicio());
+    proyecto.setFechaFinalizacion(dto.getFechaFinalizacion());
 
-        // Establecer estado de aprobación
-        proyecto.setCliente(cliente);
-        proyecto.setEstadoAprobacion(EstadoAprobacionProyecto.PENDIENTE_APROBACION);
-        proyecto.setFechaSolicitudAprobacion(LocalDateTime.now());
-        proyecto.setActivo(false);  // Inactivo hasta que el cliente apruebe
+    // 4. Establecer relación con cliente y estado de aprobación
+    proyecto.setCliente(cliente);
+    proyecto.setEstadoAprobacion(EstadoAprobacionProyecto.PENDIENTE_APROBACION);
+    proyecto.setFechaSolicitudAprobacion(LocalDateTime.now());
+    proyecto.setActivo(false);  // Inactivo hasta que el cliente apruebe
 
-        // Guardar imagen principal si existe
-        if (dto.getImagenPrincipal() != null && !dto.getImagenPrincipal().isEmpty()) {
+    // 5. Guardar imagen principal si existe
+    if (dto.getImagenPrincipal() != null && !dto.getImagenPrincipal().isEmpty()) {
+        try {
             String rutaImagenPrincipal = fileStorageService.guardarArchivo(
                     dto.getImagenPrincipal(), "proyectos");
             proyecto.setImagenPrincipal(rutaImagenPrincipal);
+            log.info("Imagen principal guardada: {}", rutaImagenPrincipal);
+        } catch (Exception e) {
+            log.error("Error al guardar imagen principal", e);
+            throw new BadRequestException("Error al guardar la imagen principal: " + e.getMessage());
         }
+    }
 
+    // 6. Guardar el proyecto primero para obtener el ID
+    try {
         proyecto = proyectoRepository.save(proyecto);
+        log.info("Proyecto guardado con ID: {}", proyecto.getId());
+    } catch (Exception e) {
+        log.error("Error al guardar proyecto", e);
+        throw new BadRequestException("Error al crear el proyecto: " + e.getMessage());
+    }
+    
+    // 7. Guardar imágenes adicionales
+    List<String> rutasImagenes = new ArrayList<>();
+    if (dto.getImagenesAdicionales() != null && !dto.getImagenesAdicionales().isEmpty()) {
+        log.info("Procesando {} imágenes adicionales", dto.getImagenesAdicionales().size());
         
-        // Guardar imágenes adicionales
-        List<String> rutasImagenes = new ArrayList<>();
-        if (dto.getImagenesAdicionales() != null && !dto.getImagenesAdicionales().isEmpty()) {
-            for (int i = 0; i < dto.getImagenesAdicionales().size(); i++) {
-                MultipartFile archivo = dto.getImagenesAdicionales().get(i);
-                if (!archivo.isEmpty()) {
+        for (int i = 0; i < dto.getImagenesAdicionales().size(); i++) {
+            MultipartFile archivo = dto.getImagenesAdicionales().get(i);
+            
+            if (archivo != null && !archivo.isEmpty()) {
+                try {
                     String rutaImagen = fileStorageService.guardarArchivo(archivo, "proyectos");
                     
                     ImagenProyecto imagenProyecto = new ImagenProyecto();
@@ -193,14 +224,22 @@ public class ContenidoService {
                     
                     imagenProyectoRepository.save(imagenProyecto);
                     rutasImagenes.add(rutaImagen);
+                    
+                    log.debug("Imagen adicional {} guardada: {}", i, rutaImagen);
+                } catch (Exception e) {
+                    log.warn("Error al guardar imagen adicional {}: {}", i, e.getMessage());
+                    // Continuar con las demás imágenes
                 }
             }
         }
         
-        log.info("Proyecto creado con ID: {}", proyecto.getId());
-        
-        return mapearProyectoAResponse(proyecto, rutasImagenes);
+        log.info("Se guardaron {} imágenes adicionales", rutasImagenes.size());
     }
+    
+    log.info("Proyecto creado exitosamente con ID: {}", proyecto.getId());
+    return mapearProyectoAResponse(proyecto, rutasImagenes);
+}
+
     
     @Transactional(readOnly = true)
     public ProyectoExitosoResponseDTO obtenerProyectoPorId(Long id) {
@@ -293,27 +332,57 @@ public class ContenidoService {
     }
     
     @Transactional
-    public void eliminarProyecto(Long id) {
-        ProyectoExitoso proyecto = proyectoRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Proyecto no encontrado"));
-        
-        // Eliminar imagen principal
-        if (proyecto.getImagenPrincipal() != null) {
-            fileStorageService.eliminarArchivo(proyecto.getImagenPrincipal());
-        }
-        
-        // Eliminar imágenes adicionales
-        List<ImagenProyecto> imagenes = imagenProyectoRepository.findByProyectoIdOrderByOrdenAsc(id);
-        for (ImagenProyecto imagen : imagenes) {
+public void eliminarProyecto(Long id) {
+    log.info("Iniciando eliminación de proyecto ID: {}", id);
+    
+    ProyectoExitoso proyecto = proyectoRepository.findById(id)
+            .orElseThrow(() -> new NotFoundException("Proyecto no encontrado"));
+    
+    // 1. Primero obtener las imágenes asociadas antes de eliminar la relación
+    List<ImagenProyecto> imagenes = imagenProyectoRepository.findByProyectoIdOrderByOrdenAsc(id);
+    log.info("Encontradas {} imágenes adicionales para el proyecto", imagenes.size());
+    
+    // 2. Eliminar archivos físicos de imágenes adicionales
+    for (ImagenProyecto imagen : imagenes) {
+        try {
             fileStorageService.eliminarArchivo(imagen.getUrlImagen());
+            log.debug("Imagen adicional eliminada: {}", imagen.getUrlImagen());
+        } catch (Exception e) {
+            log.warn("No se pudo eliminar imagen adicional: {}", imagen.getUrlImagen(), e);
+            // Continuar con las demás imágenes
         }
-        imagenProyectoRepository.deleteByProyectoId(id);
-        
-        // Eliminar proyecto
-        proyectoRepository.delete(proyecto);
-        
-        log.info("Proyecto {} eliminado", id);
     }
+    
+    // 3. Eliminar registros de imágenes adicionales
+    try {
+        imagenProyectoRepository.deleteByProyectoId(id);
+        log.info("Registros de imágenes adicionales eliminados");
+    } catch (Exception e) {
+        log.error("Error al eliminar registros de imágenes adicionales", e);
+        throw new BadRequestException("Error al eliminar imágenes del proyecto");
+    }
+    
+    // 4. Eliminar imagen principal
+    if (proyecto.getImagenPrincipal() != null) {
+        try {
+            fileStorageService.eliminarArchivo(proyecto.getImagenPrincipal());
+            log.debug("Imagen principal eliminada: {}", proyecto.getImagenPrincipal());
+        } catch (Exception e) {
+            log.warn("No se pudo eliminar imagen principal: {}", proyecto.getImagenPrincipal(), e);
+            // Continuar con la eliminación del proyecto
+        }
+    }
+    
+    // 5. Finalmente eliminar el proyecto
+    try {
+        proyectoRepository.delete(proyecto);
+        log.info("Proyecto {} eliminado exitosamente", id);
+    } catch (Exception e) {
+        log.error("Error al eliminar proyecto", e);
+        throw new BadRequestException("Error al eliminar el proyecto: " + e.getMessage());
+    }
+}
+
     
     // ============================================
     // GESTIÓN DE APROBACIONES DE PROYECTOS

@@ -301,12 +301,12 @@
   .bg-white { background-color: #ffffff; }
   .bg-gray-50 { background-color: #f9fafb; }
   .bg-gray-100 { background-color: #f3f4f6; }
-  .bg-blue-50 { background-color: #eff6ff; }
+  .bg-blue-50 { background-color: #e1e5ea; }
   .bg-blue-600 { background-color: #2563eb; }
   .bg-blue-700 { background-color: #1d4ed8; }
   
   /* Colores de texto */
-  .text-white { color: #ffffff; }
+  .text-white { color: #8d8888; }
   .text-gray-600 { color: #4b5563; }
   .text-gray-700 { color: #374151; }
   .text-gray-900 { color: #111827; }

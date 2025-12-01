@@ -3,6 +3,7 @@ package com.constructora.backend.repository;
 import com.constructora.backend.entity.Imagen;
 import com.constructora.backend.entity.enums.TipoImagen;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,6 +16,8 @@ public interface ImagenRepository extends JpaRepository<Imagen, Long> {
     List<Imagen> findByTipoOrderByOrdenAsc(TipoImagen tipo);
     
     List<Imagen> findByActivoTrueOrderByOrdenAsc();
+     @Modifying  // ← AGREGADO: Necesario para operaciones de modificación
+    void deleteByProyectoId(Long proyectoId);
     
     long countByTipo(TipoImagen tipo);
 }

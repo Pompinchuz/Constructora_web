@@ -11,6 +11,7 @@ import com.constructora.backend.controller.dto.ProyectoExitosoDTO;
 import com.constructora.backend.controller.dto.ProyectoExitosoResponseDTO;
 import com.constructora.backend.entity.Cliente;
 import com.constructora.backend.entity.enums.TipoImagen;
+import com.constructora.backend.exception.BadRequestException;
 import com.constructora.backend.exception.NotFoundException;
 import com.constructora.backend.repository.ClienteRepository;
 import com.constructora.backend.service.ContenidoService;
@@ -197,32 +198,72 @@ public class ContenidoController {
     // GESTIÓN DE PROYECTOS (ADMIN) - USANDO hasAuthority
     // ============================================
     
-    @PostMapping(value = "/proyectos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
-    public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> crearProyecto(
-            @RequestParam("nombre") String nombre,
-            @RequestParam("clienteId") Long clienteId,
-            @RequestParam(value = "descripcion", required = false) String descripcion,
-            @RequestParam(value = "ubicacion", required = false) String ubicacion,
-            @RequestParam(value = "fechaInicio", required = false) String fechaInicio,
-            @RequestParam(value = "fechaFinalizacion", required = false) String fechaFinalizacion,
-            @RequestParam(value = "imagenPrincipal", required = false) MultipartFile imagenPrincipal,
-            @RequestParam(value = "imagenesAdicionales", required = false) List<MultipartFile> imagenesAdicionales) {
+@PostMapping(value = "/proyectos", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+@PreAuthorize("hasAuthority('ADMINISTRADOR')")
+public ResponseEntity<ApiResponseDTO<ProyectoExitosoResponseDTO>> crearProyecto(
+        @RequestParam("nombre") String nombre,
+        @RequestParam("clienteId") Long clienteId,
+        @RequestParam(value = "descripcion", required = false) String descripcion,
+        @RequestParam(value = "ubicacion", required = false) String ubicacion,
+        @RequestParam(value = "fechaInicio", required = false) String fechaInicio,
+        @RequestParam(value = "fechaFinalizacion", required = false) String fechaFinalizacion,
+        @RequestParam(value = "imagenPrincipal", required = false) MultipartFile imagenPrincipal,
+        @RequestParam(value = "imagenesAdicionales", required = false) List<MultipartFile> imagenesAdicionales) {
 
-        log.info("Admin creando proyecto: {} para cliente: {}", nombre, clienteId);
+    log.info("Admin creando proyecto: {} para cliente: {}", nombre, clienteId);
 
+    try {
+        // Validar datos básicos antes de crear el DTO
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(
+                ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                    .success(false)
+                    .message("El nombre del proyecto es obligatorio")
+                    .timestamp(LocalDateTime.now())
+                    .build()
+            );
+        }
+        
+        if (clienteId == null) {
+            return ResponseEntity.badRequest().body(
+                ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                    .success(false)
+                    .message("El ID del cliente es obligatorio")
+                    .timestamp(LocalDateTime.now())
+                    .build()
+            );
+        }
+
+        // Crear DTO
         ProyectoExitosoDTO dto = new ProyectoExitosoDTO();
-        dto.setNombre(nombre);
+        dto.setNombre(nombre.trim());
         dto.setClienteId(clienteId);
-        dto.setDescripcion(descripcion);
-        dto.setUbicacion(ubicacion);
+        dto.setDescripcion(descripcion != null ? descripcion.trim() : null);
+        dto.setUbicacion(ubicacion != null ? ubicacion.trim() : null);
 
-        if (fechaInicio != null) dto.setFechaInicio(LocalDate.parse(fechaInicio));
-        if (fechaFinalizacion != null) dto.setFechaFinalizacion(LocalDate.parse(fechaFinalizacion));
+        // Parsear fechas con manejo de errores
+        try {
+            if (fechaInicio != null && !fechaInicio.trim().isEmpty()) {
+                dto.setFechaInicio(LocalDate.parse(fechaInicio));
+            }
+            if (fechaFinalizacion != null && !fechaFinalizacion.trim().isEmpty()) {
+                dto.setFechaFinalizacion(LocalDate.parse(fechaFinalizacion));
+            }
+        } catch (Exception e) {
+            log.error("Error al parsear fechas", e);
+            return ResponseEntity.badRequest().body(
+                ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                    .success(false)
+                    .message("Formato de fecha inválido. Use formato: YYYY-MM-DD")
+                    .timestamp(LocalDateTime.now())
+                    .build()
+            );
+        }
 
         dto.setImagenPrincipal(imagenPrincipal);
         dto.setImagenesAdicionales(imagenesAdicionales);
 
+        // Crear proyecto
         ProyectoExitosoResponseDTO response = contenidoService.crearProyecto(dto);
         
         return ResponseEntity.status(HttpStatus.CREATED).body(
@@ -233,7 +274,37 @@ public class ContenidoController {
                 .timestamp(LocalDateTime.now())
                 .build()
         );
+        
+    } catch (NotFoundException e) {
+        log.error("Cliente no encontrado", e);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+            ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                .success(false)
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    } catch (BadRequestException e) {
+        log.error("Error de validación", e);
+        return ResponseEntity.badRequest().body(
+            ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                .success(false)
+                .message(e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
+    } catch (Exception e) {
+        log.error("Error inesperado al crear proyecto", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+            ApiResponseDTO.<ProyectoExitosoResponseDTO>builder()
+                .success(false)
+                .message("Error al crear proyecto: " + e.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build()
+        );
     }
+}
+
     
     @GetMapping("/proyectos/admin")
     @PreAuthorize("hasAuthority('ADMINISTRADOR')")  // ← CAMBIADO
