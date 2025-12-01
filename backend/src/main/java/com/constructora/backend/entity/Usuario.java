@@ -1,7 +1,5 @@
 package com.constructora.backend.entity;
 
-import jakarta.persistence.DiscriminatorColumn;
-import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,9 +31,14 @@ public class Usuario {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TipoUsuario tipoUsuario;
-    
+    /*
     @Column(nullable = false)
-    private Boolean activo = true;
+    private Boolean activo = true;   
+    */
+ @Column(nullable = false, columnDefinition = "TINYINT(1)")
+private Boolean activo = true;
+
+    
     
     @Column(updatable = false)
     private LocalDateTime fechaCreacion;
